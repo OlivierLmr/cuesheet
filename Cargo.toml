@@ -1,0 +1,22 @@
+[package]
+name = "cuesheet"
+version = "0.1.0"
+edition = "2021"
+description = "Draws a distributed run as a space-time diagram: arrows slant from the instant a message left to the instant it landed"
+
+[dependencies]
+# Text width has to be computed from bytes the binary owns, or the output stops
+# being reproducible on another machine. ttf-parser reads the embedded face and
+# nothing else — no system fonts, no fallback chain, no shaping.
+ttf-parser = "0.25"
+
+# PNG is the SVG rasterised. Optional because resvg is a large tree and the
+# default build has no business carrying it.
+resvg = { version = "0.45", optional = true }
+
+[features]
+default = []
+png = ["dep:resvg"]
+
+[profile.release]
+opt-level = 2
