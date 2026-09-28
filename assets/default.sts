@@ -5,6 +5,11 @@
 # common forms of colour blindness — and every difference is carried twice, by shape or by line
 # style as well as by colour, so the picture survives a monochrome printout.
 
+# The one declaration the default sheet makes. `run end` is how a document says where the axis
+# stops, and without it nothing can ever be *still in flight* — a message arriving after the run
+# finished would be drawn as though it had arrived. Every other name is yours.
+kind point end kills
+
 style diagram stretch=1.5 axis=linear gap=200 lane-pitch=160 row-pitch=28 theme=light bodies=off
 
 # Structure.

@@ -483,3 +483,61 @@ fn a_long_body_widens_the_page_rather_than_running_off_it() {
     let narrow = picture("0 n0 -> n1 .rb +10", Some("style diagram bodies=on"), true);
     assert!(pic.width > narrow.width + f.width(&long, 11.0) * 0.8);
 }
+
+// ---------------------------------------------------------------------------
+// The closed lists, each checked to actually reach the page
+// ---------------------------------------------------------------------------
+
+/// A shape nobody can draw is a shape nobody will use. Every name in the list produces something,
+/// and `none` produces nothing, which is the whole point of it.
+#[test]
+fn every_marker_shape_draws_something_except_none() {
+    for shape in ["dot", "ring", "square", "diamond", "cross", "bar", "chevron"] {
+        let pic = picture("10 n0 thing", Some(&format!("style thing mark={shape}")), true);
+        let marks = pic
+            .prims
+            .iter()
+            .filter(|p| {
+                matches!(p, Prim::Circle { .. } | Prim::Polygon { .. })
+                    || matches!(p, Prim::Rect { .. })
+                    || matches!(p, Prim::Line { x1, x2, y1, y2, .. }
+                        if (x2 - x1).abs() < 30.0 && (y2 - y1).abs() < 30.0)
+            })
+            .count();
+        assert!(marks > 0, "{shape} drew nothing");
+    }
+    let none = picture("10 n0 thing", Some("style thing mark=none"), true);
+    assert!(
+        !none.prims.iter().any(|p| matches!(p, Prim::Circle { .. })),
+        "`none` should draw no marker"
+    );
+}
+
+/// Every pseudo-class the derivation can produce is reachable from a selector. One that never
+/// matches is a promise the style sheet cannot keep.
+#[test]
+fn every_pseudo_class_is_reachable_from_a_selector() {
+    // (document, selector, the colour it must take)
+    let cases: &[(&str, &str, &str)] = &[
+        ("0 n0 -> n1 .m +10", "arrow:arrived", "#110011"),
+        ("5 n0 crash\n10 n0 -> n1 .m +10", "arrow:never-left", "#110022"),
+        ("5 n1 crash\n0 n0 -> n1 .m +10", "arrow:died", "#110033"),
+        ("0 n0 -x n1 .m", "arrow:eaten", "#110044"),
+        ("0 n0 -> n1 .m +99\n10 run end", "arrow:in-flight", "#110055"),
+        ("5 n0 crash\n10 run end", "lifeline:dead", "#110066"),
+        ("0 n0 deliver\n10 run end", "lifeline:alive", "#110077"),
+        ("0 n0 s\n10 run end", "s:open", "#110088"),
+        ("participants n0 n1\n0 network s +5", "s:network", "#110099"),
+        ("0 n0 s +5", "s:node", "#1100aa"),
+        ("participants n0\n0 run r", "r:run", "#1100bb"),
+    ];
+    let base = "kind point crash kills\nkind span s\nkind point r\n";
+    for (doc, selector, colour) in cases {
+        let style = format!("{base}style {selector} color={colour} fill={colour}");
+        let out = svg::render(&picture(doc, Some(&style), true), &svg::Options::default());
+        assert!(
+            out.contains(colour),
+            "`{selector}` never matched anything in `{doc}`"
+        );
+    }
+}
