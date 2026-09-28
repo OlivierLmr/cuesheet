@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 684 636.65" width="684" height="636.65" role="img">
+  <title>A relay that never happened</title>
+  <desc>drawn: the reliable-broadcast run where n0 crashes mid-broadcast</desc>
+  <defs>
+    <marker id="h0072b2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="#0072b2"/></marker>
+  </defs>
+  <rect x="0" y="0" width="684" height="636.65" fill="#ffffff"/>
+  <text x="36" y="59.5" font-size="11" text-anchor="end" fill="#878f9b" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-variant-numeric="tabular-nums">0</text>
+  <line x1="44" y1="56" x2="622" y2="56" stroke="#c3c9d3" stroke-width="1" stroke-dasharray="1 5" stroke-opacity="0.55"/>
+  <text x="36" y="204.5" font-size="11" text-anchor="end" fill="#878f9b" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-variant-numeric="tabular-nums">100</text>
+  <line x1="44" y1="201" x2="622" y2="201" stroke="#c3c9d3" stroke-width="1" stroke-dasharray="1 5" stroke-opacity="0.55"/>
+  <text x="36" y="349.5" font-size="11" text-anchor="end" fill="#878f9b" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-variant-numeric="tabular-nums">200</text>
+  <line x1="44" y1="346" x2="622" y2="346" stroke="#c3c9d3" stroke-width="1" stroke-dasharray="1 5" stroke-opacity="0.55"/>
+  <text x="36" y="494.5" font-size="11" text-anchor="end" fill="#878f9b" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-variant-numeric="tabular-nums">300</text>
+  <line x1="44" y1="491" x2="622" y2="491" stroke="#c3c9d3" stroke-width="1" stroke-dasharray="1 5" stroke-opacity="0.55"/>
+  <text x="78" y="34" font-size="13" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-variant-numeric="tabular-nums">n0</text>
+  <line x1="78" y1="44" x2="78" y2="201" stroke="#c3c9d3" stroke-width="1.5"/>
+  <line x1="78" y1="201" x2="78" y2="602.65" stroke="#dbdfe6" stroke-width="1.5" stroke-dasharray="2 6"/>
+  <text x="248" y="34" font-size="13" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-variant-numeric="tabular-nums">n1</text>
+  <line x1="248" y1="44" x2="248" y2="602.65" stroke="#c3c9d3" stroke-width="1.5"/>
+  <text x="418" y="34" font-size="13" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-variant-numeric="tabular-nums">n2</text>
+  <line x1="418" y1="44" x2="418" y2="602.65" stroke="#c3c9d3" stroke-width="1.5"/>
+  <text x="588" y="34" font-size="13" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-variant-numeric="tabular-nums">n3</text>
+  <line x1="588" y1="44" x2="588" y2="602.65" stroke="#c3c9d3" stroke-width="1.5"/>
+  <line x1="78" y1="56" x2="248" y2="70.5" stroke="#0072b2" stroke-width="1.5" marker-end="url(#h0072b2)"/>
+  <line x1="248" y1="70.5" x2="78" y2="99.5" stroke="#0072b2" stroke-width="1.5" marker-end="url(#h0072b2)"/>
+  <line x1="248" y1="114" x2="418" y2="143" stroke="#0072b2" stroke-width="1.5" marker-end="url(#h0072b2)"/>
+  <line x1="418" y1="143" x2="78" y2="172" stroke="#0072b2" stroke-width="1.5" marker-end="url(#h0072b2)"/>
+  <line x1="248" y1="156.05" x2="588" y2="185.05" stroke="#0072b2" stroke-width="1.5" marker-end="url(#h0072b2)"/>
+  <line x1="588" y1="205.35" x2="248" y2="234.35" stroke="#0072b2" stroke-width="1.5" marker-end="url(#h0072b2)"/>
+  <line x1="78" y1="286.55" x2="152.8" y2="292.93" stroke="#cc79a7" stroke-width="1.5" stroke-dasharray="3 3"/>
+  <line x1="147.8" y1="287.93" x2="157.8" y2="297.93" stroke="#cc79a7" stroke-width="1.8"/>
+  <line x1="157.8" y1="287.93" x2="147.8" y2="297.93" stroke="#cc79a7" stroke-width="1.8"/>
+  <line x1="418" y1="308.3" x2="248" y2="337.3" stroke="#0072b2" stroke-width="1.5" marker-end="url(#h0072b2)"/>
+  <line x1="588" y1="486.65" x2="418" y2="515.65" stroke="#0072b2" stroke-width="1.5" marker-end="url(#h0072b2)"/>
+  <line x1="78" y1="534.5" x2="190.2" y2="540.88" stroke="#cc79a7" stroke-width="1.5" stroke-dasharray="3 3"/>
+  <line x1="185.2" y1="535.88" x2="195.2" y2="545.88" stroke="#cc79a7" stroke-width="1.8"/>
+  <line x1="195.2" y1="535.88" x2="185.2" y2="545.88" stroke="#cc79a7" stroke-width="1.8"/>
+  <line x1="418" y1="573.65" x2="588" y2="602.65" stroke="#0072b2" stroke-width="1.5" marker-end="url(#h0072b2)"/>
+  <polygon points="70.8,52 77.2,56 70.8,60" fill="#009e73"/>
+  <circle cx="78" cy="56" r="4" fill="#0072b2"/>
+  <circle cx="248" cy="70.5" r="4" fill="#0072b2"/>
+  <circle cx="418" cy="143" r="4" fill="#0072b2"/>
+  <circle cx="588" cy="185.05" r="4" fill="#0072b2"/>
+  <line x1="74" y1="197" x2="82" y2="205" stroke="#cc79a7" stroke-width="1.8"/>
+  <line x1="82" y1="197" x2="74" y2="205" stroke="#cc79a7" stroke-width="1.8"/>
+  <line x1="44" y1="602.65" x2="622" y2="602.65" stroke="#878f9b" stroke-width="1" stroke-dasharray="4 3"/>
+  <text x="88" y="60" font-size="11" text-anchor="start" fill="#0072b2" font-family="Inter, ui-sans-serif, system-ui, sans-serif">deliver</text>
+  <text x="88" y="73.75" font-size="11" text-anchor="start" fill="#009e73" font-family="Inter, ui-sans-serif, system-ui, sans-serif">do_broadcast</text>
+  <text x="88" y="205" font-size="11" text-anchor="start" fill="#cc79a7" font-family="Inter, ui-sans-serif, system-ui, sans-serif">crash</text>
+  <text x="258" y="74.5" font-size="11" text-anchor="start" fill="#0072b2" font-family="Inter, ui-sans-serif, system-ui, sans-serif">deliver</text>
+  <text x="428" y="147" font-size="11" text-anchor="start" fill="#0072b2" font-family="Inter, ui-sans-serif, system-ui, sans-serif">deliver</text>
+  <text x="598" y="189.05" font-size="11" text-anchor="start" fill="#0072b2" font-family="Inter, ui-sans-serif, system-ui, sans-serif">deliver</text>
+  <text x="618" y="597.65" font-size="11" text-anchor="end" fill="#878f9b" font-family="Inter, ui-sans-serif, system-ui, sans-serif">quiescent</text>
+  <text x="180.74" y="73.9" font-size="11" text-anchor="middle" fill="#0072b2" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(4.88 180.74 73.9)">rb</text>
+  <text x="166.8" y="75.11" font-size="11" text-anchor="middle" fill="#0072b2" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-9.68 166.8 75.11)">rb</text>
+  <text x="331.47" y="137.48" font-size="11" text-anchor="middle" fill="#0072b2" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(9.68 331.47 137.48)">rb</text>
+  <text x="236.88" y="149.31" font-size="11" text-anchor="middle" fill="#0072b2" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-4.88 236.88 149.31)">rb</text>
+  <text x="406.88" y="178.74" font-size="11" text-anchor="middle" fill="#0072b2" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(4.88 406.88 178.74)">rb</text>
+  <text x="406.88" y="211.66" font-size="11" text-anchor="middle" fill="#0072b2" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-4.88 406.88 211.66)">rb</text>
+  <text x="114.63" y="298.82" font-size="11" text-anchor="middle" fill="#cc79a7" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(4.88 114.63 298.82)">rb</text>
+  <text x="331.47" y="313.82" font-size="11" text-anchor="middle" fill="#0072b2" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-9.68 331.47 313.82)">rb</text>
+  <text x="486.57" y="494.71" font-size="11" text-anchor="middle" fill="#0072b2" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-9.68 486.57 494.71)">rb</text>
+  <text x="133.58" y="546.78" font-size="11" text-anchor="middle" fill="#cc79a7" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(3.25 133.58 546.78)">rb</text>
+  <text x="499.15" y="596.73" font-size="11" text-anchor="middle" fill="#0072b2" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(9.68 499.15 596.73)">rb</text>
+</svg>

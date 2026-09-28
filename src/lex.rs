@@ -45,11 +45,12 @@ pub struct LexError {
 /// A bare word's character set.
 ///
 /// Colons are in it on purpose: a cuelight message type is an arbitrary JSON string, and one that
-/// carries a colon should not need quoting to survive. `=` and `#` are in it so that
-/// `color=#0072b2` is one word — a `#` only begins a comment at the *start* of a token, which is
-/// tested at the top of the scanning loop, so it is free to appear inside one.
+/// carries a colon should not need quoting to survive. `=`, `#` and `,` are in it so that
+/// `color=#0072b2` and `dash=2,6` are each one word — a `#` only begins a comment at the *start*
+/// of a token, which is tested at the top of the scanning loop, so it is free to appear inside
+/// one.
 fn is_bare(c: char) -> bool {
-    c.is_ascii_alphanumeric() || matches!(c, '_' | '.' | ':' | '/' | '-' | '=' | '#')
+    c.is_ascii_alphanumeric() || matches!(c, '_' | '.' | ':' | '/' | '-' | '=' | '#' | ',')
 }
 
 /// Split one line into tokens, stopping at `#` unless it is inside quotes.
@@ -376,6 +377,7 @@ mod tests {
     #[test]
     fn a_hash_inside_a_word_is_not_a_comment() {
         assert_eq!(toks("color=#0072b2"), vec![Token::Word("color=#0072b2".into())]);
+        assert_eq!(toks("dash=2,6"), vec![Token::Word("dash=2,6".into())]);
         assert_eq!(toks("style arrow color=#14171c # ink"), vec![
             Token::Word("style".into()),
             Token::Word("arrow".into()),

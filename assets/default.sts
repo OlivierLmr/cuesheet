@@ -1,0 +1,22 @@
+# The default style sheet.
+#
+# Every row of the encoding table lives here rather than in the renderer, so all of it can be
+# overridden a line at a time. Hues are Okabe-Ito, which stays distinguishable under all three
+# common forms of colour blindness — and every difference is carried twice, by shape or by line
+# style as well as by colour, so the picture survives a monochrome printout.
+
+style diagram stretch=1.5 axis=linear gap=200 lane-pitch=160 row-pitch=28 theme=light bodies=off
+
+# Structure.
+style lifeline        color=#c3c9d3 width=1.5
+style lifeline:dead   color=#dbdfe6 width=1.5 dash=2,6
+
+# Messages. The fate is in the line style; the colour only agrees with it.
+style arrow             color=#14171c width=1.5
+style arrow:never-left  color=#cc79a7 dash=3,3
+style arrow:died        color=#cc79a7
+style arrow:eaten       color=#d55e00 dash=1,3
+style arrow:in-flight   color=#878f9b
+
+# Spans. A span that never closed is torn at the far end.
+style span:open  edge=ragged

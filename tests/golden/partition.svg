@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 684 343.75" width="684" height="343.75" role="img">
+  <title>A split, and a node that came back</title>
+  <desc>A run with a partition: n1 and n3 are cut off from n0 and n2, and one node
+crashes inside the window and comes back after it heals.</desc>
+  <defs>
+    <marker id="h0072b2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="#0072b2"/></marker>
+    <marker id="h14171c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="#14171c"/></marker>
+  </defs>
+  <rect x="0" y="0" width="684" height="343.75" fill="#ffffff"/>
+  <text x="36" y="59.5" font-size="11" text-anchor="end" fill="#878f9b" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-variant-numeric="tabular-nums">0</text>
+  <line x1="44" y1="56" x2="622" y2="56" stroke="#c3c9d3" stroke-width="1" stroke-dasharray="1 5" stroke-opacity="0.55"/>
+  <text x="36" y="132" font-size="11" text-anchor="end" fill="#878f9b" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-variant-numeric="tabular-nums">50</text>
+  <line x1="44" y1="128.5" x2="622" y2="128.5" stroke="#c3c9d3" stroke-width="1" stroke-dasharray="1 5" stroke-opacity="0.55"/>
+  <text x="36" y="204.5" font-size="11" text-anchor="end" fill="#878f9b" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-variant-numeric="tabular-nums">100</text>
+  <line x1="44" y1="201" x2="622" y2="201" stroke="#c3c9d3" stroke-width="1" stroke-dasharray="1 5" stroke-opacity="0.55"/>
+  <text x="36" y="277" font-size="11" text-anchor="end" fill="#878f9b" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-variant-numeric="tabular-nums">150</text>
+  <line x1="44" y1="273.5" x2="622" y2="273.5" stroke="#c3c9d3" stroke-width="1" stroke-dasharray="1 5" stroke-opacity="0.55"/>
+  <text x="78" y="34" font-size="13" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-variant-numeric="tabular-nums">n0</text>
+  <line x1="78" y1="44" x2="78" y2="309.75" stroke="#c3c9d3" stroke-width="1.5"/>
+  <text x="248" y="34" font-size="13" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-variant-numeric="tabular-nums">n1</text>
+  <line x1="248" y1="44" x2="248" y2="143" stroke="#c3c9d3" stroke-width="1.5"/>
+  <line x1="248" y1="143" x2="248" y2="215.5" stroke="#dbdfe6" stroke-width="1.5" stroke-dasharray="2 6"/>
+  <line x1="248" y1="215.5" x2="248" y2="309.75" stroke="#c3c9d3" stroke-width="1.5"/>
+  <text x="418" y="34" font-size="13" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-variant-numeric="tabular-nums">n2</text>
+  <line x1="418" y1="44" x2="418" y2="309.75" stroke="#c3c9d3" stroke-width="1.5"/>
+  <text x="588" y="34" font-size="13" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-variant-numeric="tabular-nums">n3</text>
+  <line x1="588" y1="44" x2="588" y2="309.75" stroke="#c3c9d3" stroke-width="1.5"/>
+  <rect x="205.5" y="85" width="85" height="130.5" rx="2" fill="#c3c9d3" fill-opacity="0.25"/>
+  <rect x="545.5" y="85" width="85" height="130.5" rx="2" fill="#c3c9d3" fill-opacity="0.25"/>
+  <rect x="584.5" y="114" width="7" height="72.5" rx="2" fill="#c3c9d3"/>
+  <line x1="78" y1="56" x2="248" y2="73.4" stroke="#0072b2" stroke-width="1.5" marker-end="url(#h0072b2)"/>
+  <line x1="78" y1="56" x2="418" y2="69.05" stroke="#0072b2" stroke-width="1.5" marker-end="url(#h0072b2)"/>
+  <line x1="248" y1="92.25" x2="418" y2="193.75" stroke="#0072b2" stroke-width="1.5" marker-end="url(#h0072b2)"/>
+  <line x1="418" y1="99.5" x2="78" y2="111.1" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="78" y1="135.75" x2="588" y2="164.75" stroke="#0072b2" stroke-width="1.5" marker-end="url(#h0072b2)"/>
+  <line x1="418" y1="193.75" x2="248" y2="208.25" stroke="#cc79a7" stroke-width="1.5"/>
+  <line x1="243" y1="203.25" x2="253" y2="213.25" stroke="#cc79a7" stroke-width="1.8"/>
+  <line x1="253" y1="203.25" x2="243" y2="213.25" stroke="#cc79a7" stroke-width="1.8"/>
+  <line x1="248" y1="222.75" x2="78" y2="243.05" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <path d="M 78 259 C 125.6 259, 125.6 280.75, 78 280.75" fill="none" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="418" y1="273.5" x2="477.84" y2="279.84" stroke="#d55e00" stroke-width="1.5" stroke-dasharray="1 3"/>
+  <line x1="472.84" y1="274.84" x2="482.84" y2="284.84" stroke="#d55e00" stroke-width="1.8"/>
+  <line x1="482.84" y1="274.84" x2="472.84" y2="284.84" stroke="#d55e00" stroke-width="1.8"/>
+  <polygon points="70.8,52 77.2,56 70.8,60" fill="#009e73"/>
+  <circle cx="248" cy="73.4" r="4" fill="#0072b2"/>
+  <circle cx="418" cy="69.05" r="4" fill="#0072b2"/>
+  <line x1="244" y1="139" x2="252" y2="147" stroke="#cc79a7" stroke-width="1.8"/>
+  <line x1="252" y1="139" x2="244" y2="147" stroke="#cc79a7" stroke-width="1.8"/>
+  <circle cx="248" cy="215.5" r="4" fill="none" stroke="#009e73" stroke-width="1.4"/>
+  <circle cx="588" cy="230" r="4" fill="#0072b2"/>
+  <line x1="44" y1="309.75" x2="622" y2="309.75" stroke="#878f9b" stroke-width="1" stroke-dasharray="4 3"/>
+  <text x="88" y="60" font-size="11" text-anchor="start" fill="#009e73" font-family="Inter, ui-sans-serif, system-ui, sans-serif">do_broadcast</text>
+  <text x="258" y="77.4" font-size="11" text-anchor="start" fill="#0072b2" font-family="Inter, ui-sans-serif, system-ui, sans-serif">deliver</text>
+  <text x="258" y="147" font-size="11" text-anchor="start" fill="#cc79a7" font-family="Inter, ui-sans-serif, system-ui, sans-serif">crash</text>
+  <text x="258" y="219.5" font-size="11" text-anchor="start" fill="#009e73" font-family="Inter, ui-sans-serif, system-ui, sans-serif">recover</text>
+  <text x="428" y="73.05" font-size="11" text-anchor="start" fill="#0072b2" font-family="Inter, ui-sans-serif, system-ui, sans-serif">deliver</text>
+  <text x="598" y="234" font-size="11" text-anchor="start" fill="#0072b2" font-family="Inter, ui-sans-serif, system-ui, sans-serif">deliver</text>
+  <text x="618" y="304.75" font-size="11" text-anchor="end" fill="#878f9b" font-family="Inter, ui-sans-serif, system-ui, sans-serif">quiescent</text>
+  <text x="162.07" y="73.76" font-size="11" text-anchor="middle" fill="#0072b2" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(5.84 162.07 73.76)">rb</text>
+  <text x="236.89" y="71.21" font-size="11" text-anchor="middle" fill="#0072b2" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(2.2 236.89 71.21)">rb</text>
+  <text x="324.97" y="148.81" font-size="11" text-anchor="middle" fill="#0072b2" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(30.84 324.97 148.81)">rb</text>
+  <text x="233.2" y="96.69" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-1.95 233.2 96.69)">ack</text>
+  <text x="339.71" y="159.75" font-size="11" text-anchor="middle" fill="#0072b2" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(3.25 339.71 159.75)">rb</text>
+  <text x="332.23" y="191.92" font-size="11" text-anchor="middle" fill="#cc79a7" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-4.88 332.23 191.92)">rb</text>
+  <text x="161.92" y="223.86" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-6.81 161.92 223.86)">ack</text>
+  <text x="68.89" y="267.66" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif">retry</text>
+  <text x="446.96" y="285.73" font-size="11" text-anchor="middle" fill="#d55e00" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(6.04 446.96 285.73)">rb</text>
+</svg>

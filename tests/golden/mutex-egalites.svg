@@ -1,0 +1,200 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 684 4822.8" width="684" height="4822.8" role="img">
+  <title>Lamport mutex: four processes, two rounds</title>
+  <desc>converted from diagrammes/mutex-egalites.mmd — Lamport mutex, two rounds</desc>
+  <defs>
+    <marker id="h14171c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="#14171c"/></marker>
+  </defs>
+  <rect x="0" y="0" width="684" height="4822.8" fill="#ffffff"/>
+  <text x="36" y="59.5" font-size="11" text-anchor="end" fill="#878f9b" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-variant-numeric="tabular-nums">1000</text>
+  <line x1="44" y1="56" x2="622" y2="56" stroke="#c3c9d3" stroke-width="1" stroke-dasharray="1 5" stroke-opacity="0.55"/>
+  <text x="36" y="784.5" font-size="11" text-anchor="end" fill="#878f9b" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-variant-numeric="tabular-nums">1500</text>
+  <line x1="44" y1="781" x2="622" y2="781" stroke="#c3c9d3" stroke-width="1" stroke-dasharray="1 5" stroke-opacity="0.55"/>
+  <text x="36" y="1509.5" font-size="11" text-anchor="end" fill="#878f9b" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-variant-numeric="tabular-nums">2000</text>
+  <line x1="44" y1="1506" x2="622" y2="1506" stroke="#c3c9d3" stroke-width="1" stroke-dasharray="1 5" stroke-opacity="0.55"/>
+  <text x="36" y="2234.5" font-size="11" text-anchor="end" fill="#878f9b" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-variant-numeric="tabular-nums">2500</text>
+  <line x1="44" y1="2231" x2="622" y2="2231" stroke="#c3c9d3" stroke-width="1" stroke-dasharray="1 5" stroke-opacity="0.55"/>
+  <text x="36" y="2959.5" font-size="11" text-anchor="end" fill="#878f9b" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-variant-numeric="tabular-nums">3000</text>
+  <line x1="44" y1="2956" x2="622" y2="2956" stroke="#c3c9d3" stroke-width="1" stroke-dasharray="1 5" stroke-opacity="0.55"/>
+  <text x="36" y="3684.5" font-size="11" text-anchor="end" fill="#878f9b" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-variant-numeric="tabular-nums">3500</text>
+  <line x1="44" y1="3681" x2="622" y2="3681" stroke="#c3c9d3" stroke-width="1" stroke-dasharray="1 5" stroke-opacity="0.55"/>
+  <text x="36" y="4409.5" font-size="11" text-anchor="end" fill="#878f9b" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-variant-numeric="tabular-nums">4000</text>
+  <line x1="44" y1="4406" x2="622" y2="4406" stroke="#c3c9d3" stroke-width="1" stroke-dasharray="1 5" stroke-opacity="0.55"/>
+  <text x="78" y="34" font-size="13" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-variant-numeric="tabular-nums">n0</text>
+  <line x1="78" y1="44" x2="78" y2="4788.8" stroke="#c3c9d3" stroke-width="1.5"/>
+  <text x="248" y="34" font-size="13" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-variant-numeric="tabular-nums">n1</text>
+  <line x1="248" y1="44" x2="248" y2="4788.8" stroke="#c3c9d3" stroke-width="1.5"/>
+  <text x="418" y="34" font-size="13" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-variant-numeric="tabular-nums">n2</text>
+  <line x1="418" y1="44" x2="418" y2="4788.8" stroke="#c3c9d3" stroke-width="1.5"/>
+  <text x="588" y="34" font-size="13" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-variant-numeric="tabular-nums">n3</text>
+  <line x1="588" y1="44" x2="588" y2="4788.8" stroke="#c3c9d3" stroke-width="1.5"/>
+  <rect x="74.5" y="95.15" width="7" height="72.5" rx="3" fill="#d55e00" fill-opacity="0.3"/>
+  <rect x="244.5" y="189.4" width="7" height="72.5" rx="3" fill="#d55e00" fill-opacity="0.3"/>
+  <rect x="414.5" y="276.4" width="7" height="72.5" rx="3" fill="#d55e00" fill-opacity="0.3"/>
+  <rect x="584.5" y="364.85" width="7" height="72.5" rx="3" fill="#d55e00" fill-opacity="0.3"/>
+  <rect x="584.5" y="4433.55" width="7" height="72.5" rx="3" fill="#d55e00" fill-opacity="0.3"/>
+  <rect x="74.5" y="4529.25" width="7" height="72.5" rx="3" fill="#d55e00" fill-opacity="0.3"/>
+  <rect x="244.5" y="4623.5" width="7" height="72.5" rx="3" fill="#d55e00" fill-opacity="0.3"/>
+  <rect x="414.5" y="4716.3" width="7" height="72.5" rx="3" fill="#d55e00" fill-opacity="0.3"/>
+  <line x1="418" y1="56" x2="248" y2="70.5" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="78" y1="56" x2="248" y2="70.5" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="418" y1="56" x2="78" y2="71.95" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="78" y1="56" x2="588" y2="71.95" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="588" y1="56" x2="78" y2="73.4" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="248" y1="56" x2="78" y2="73.4" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="418" y1="56" x2="588" y2="73.4" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="588" y1="56" x2="418" y2="76.3" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="248" y1="56" x2="588" y2="76.3" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="248" y1="56" x2="418" y2="77.75" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="78" y1="56" x2="418" y2="77.75" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="588" y1="56" x2="248" y2="82.1" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="248" y1="70.5" x2="418" y2="85" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="248" y1="70.5" x2="78" y2="89.35" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="78" y1="71.95" x2="418" y2="90.8" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="588" y1="71.95" x2="78" y2="95.15" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="78" y1="73.4" x2="588" y2="87.9" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="588" y1="73.4" x2="418" y2="98.05" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="78" y1="73.4" x2="248" y2="100.95" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="418" y1="76.3" x2="588" y2="92.25" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="588" y1="76.3" x2="248" y2="95.15" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="418" y1="77.75" x2="248" y2="92.25" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="418" y1="77.75" x2="78" y2="95.15" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="248" y1="82.1" x2="588" y2="96.6" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="78" y1="167.65" x2="588" y2="182.15" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="78" y1="167.65" x2="418" y2="185.05" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="78" y1="167.65" x2="248" y2="189.4" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="248" y1="261.9" x2="418" y2="276.4" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="248" y1="261.9" x2="78" y2="280.75" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="248" y1="261.9" x2="588" y2="289.45" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="418" y1="348.9" x2="78" y2="363.4" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="418" y1="348.9" x2="588" y2="364.85" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="418" y1="348.9" x2="248" y2="366.3" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="588" y1="437.35" x2="248" y2="451.85" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="588" y1="437.35" x2="418" y2="451.85" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="588" y1="437.35" x2="78" y2="453.3" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="418" y1="4406" x2="78" y2="4420.5" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="588" y1="4406" x2="248" y2="4421.95" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="78" y1="4406" x2="418" y2="4421.95" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="78" y1="4406" x2="248" y2="4423.4" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="248" y1="4406" x2="418" y2="4424.85" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="418" y1="4406" x2="588" y2="4426.3" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="418" y1="4406" x2="248" y2="4426.3" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="78" y1="4406" x2="588" y2="4427.75" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="588" y1="4406" x2="418" y2="4430.65" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="248" y1="4406" x2="78" y2="4432.1" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="248" y1="4406" x2="588" y2="4433.55" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="588" y1="4406" x2="78" y2="4433.55" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="78" y1="4420.5" x2="418" y2="4443.7" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="248" y1="4421.95" x2="588" y2="4439.35" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="418" y1="4421.95" x2="78" y2="4442.25" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="248" y1="4423.4" x2="78" y2="4445.15" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="418" y1="4424.85" x2="248" y2="4440.8" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="248" y1="4426.3" x2="418" y2="4446.6" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="588" y1="4426.3" x2="418" y2="4448.05" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="588" y1="4427.75" x2="78" y2="4442.25" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="418" y1="4430.65" x2="588" y2="4449.5" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="78" y1="4432.1" x2="248" y2="4456.75" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="588" y1="4433.55" x2="248" y2="4448.05" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="78" y1="4433.55" x2="588" y2="4452.4" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="588" y1="4506.05" x2="78" y2="4529.25" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="588" y1="4506.05" x2="418" y2="4530.7" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="588" y1="4506.05" x2="248" y2="4532.15" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="78" y1="4601.75" x2="588" y2="4620.6" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="78" y1="4601.75" x2="248" y2="4623.5" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="78" y1="4601.75" x2="418" y2="4627.85" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="248" y1="4696" x2="588" y2="4714.85" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="248" y1="4696" x2="418" y2="4716.3" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="248" y1="4696" x2="78" y2="4716.3" stroke="#14171c" stroke-width="1.5" marker-end="url(#h14171c)"/>
+  <line x1="418" y1="4788.8" x2="588" y2="4788.8" stroke="#878f9b" stroke-width="1.5"/>
+  <line x1="418" y1="4788.8" x2="78" y2="4788.8" stroke="#878f9b" stroke-width="1.5"/>
+  <line x1="418" y1="4788.8" x2="248" y2="4788.8" stroke="#878f9b" stroke-width="1.5"/>
+  <polygon points="70.8,52 77.2,56 70.8,60" fill="#009e73"/>
+  <polygon points="580.8,52 587.2,56 580.8,60" fill="#009e73"/>
+  <polygon points="240.8,52 247.2,56 240.8,60" fill="#009e73"/>
+  <polygon points="410.8,52 417.2,56 410.8,60" fill="#009e73"/>
+  <polygon points="240.8,4402 247.2,4406 240.8,4410" fill="#009e73"/>
+  <polygon points="580.8,4402 587.2,4406 580.8,4410" fill="#009e73"/>
+  <polygon points="410.8,4402 417.2,4406 410.8,4410" fill="#009e73"/>
+  <polygon points="70.8,4402 77.2,4406 70.8,4410" fill="#009e73"/>
+  <line x1="44" y1="4788.8" x2="622" y2="4788.8" stroke="#878f9b" stroke-width="1" stroke-dasharray="4 3"/>
+  <text x="88" y="60" font-size="11" text-anchor="start" fill="#009e73" font-family="Inter, ui-sans-serif, system-ui, sans-serif">request_cs</text>
+  <text x="88" y="4410" font-size="11" text-anchor="start" fill="#009e73" font-family="Inter, ui-sans-serif, system-ui, sans-serif">request_cs</text>
+  <text x="258" y="60" font-size="11" text-anchor="start" fill="#009e73" font-family="Inter, ui-sans-serif, system-ui, sans-serif">request_cs</text>
+  <text x="258" y="4410" font-size="11" text-anchor="start" fill="#009e73" font-family="Inter, ui-sans-serif, system-ui, sans-serif">request_cs</text>
+  <text x="428" y="60" font-size="11" text-anchor="start" fill="#009e73" font-family="Inter, ui-sans-serif, system-ui, sans-serif">request_cs</text>
+  <text x="428" y="4410" font-size="11" text-anchor="start" fill="#009e73" font-family="Inter, ui-sans-serif, system-ui, sans-serif">request_cs</text>
+  <text x="598" y="60" font-size="11" text-anchor="start" fill="#009e73" font-family="Inter, ui-sans-serif, system-ui, sans-serif">request_cs</text>
+  <text x="598" y="4410" font-size="11" text-anchor="start" fill="#009e73" font-family="Inter, ui-sans-serif, system-ui, sans-serif">request_cs</text>
+  <text x="618" y="4783.8" font-size="11" text-anchor="end" fill="#878f9b" font-family="Inter, ui-sans-serif, system-ui, sans-serif">quiescent</text>
+  <text x="387.51" y="49.46" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-4.88 387.51 49.46)">mx_request</text>
+  <text x="151.82" y="71.44" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(4.88 151.82 71.44)">mx_request</text>
+  <text x="222.74" y="56.04" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-2.69 222.74 56.04)">mx_request</text>
+  <text x="300.65" y="72.08" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(1.79 300.65 72.08)">mx_request</text>
+  <text x="338.81" y="55.39" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-1.95 338.81 55.39)">mx_request</text>
+  <text x="168.99" y="54.93" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-5.84 168.99 54.93)">mx_request</text>
+  <text x="553.19" y="78.99" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(5.84 553.19 78.99)">mx_request</text>
+  <text x="521.35" y="54.79" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-6.81 521.35 54.79)">mx_request</text>
+  <text x="397.7" y="74.06" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(3.42 397.7 74.06)">mx_request</text>
+  <text x="275.84" y="68.74" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(7.29 275.84 68.74)">mx_request</text>
+  <text x="208.74" y="73.49" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(3.66 208.74 73.49)">mx_request</text>
+  <text x="395.49" y="61.64" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-4.39 395.49 61.64)">mx_request</text>
+  <text x="277.77" y="82.18" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(4.88 277.77 82.18)">mx_reply</text>
+  <text x="101.28" y="77.6" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-6.33 101.28 77.6)">mx_reply</text>
+  <text x="180.85" y="86.77" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(3.17 180.85 86.77)">mx_reply</text>
+  <text x="354.75" y="73.44" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-2.6 354.75 73.44)">mx_reply</text>
+  <text x="339.31" y="89.94" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(1.63 339.31 89.94)">mx_reply</text>
+  <text x="498.91" y="77.11" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-8.25 498.91 77.11)">mx_reply</text>
+  <text x="131.88" y="91.36" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(9.21 131.88 91.36)">mx_reply</text>
+  <text x="500.97" y="93.23" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(5.36 500.97 93.23)">mx_reply</text>
+  <text x="452.79" y="74.67" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-3.17 452.79 74.67)">mx_reply</text>
+  <text x="331.31" y="76" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-4.88 331.31 76)">mx_reply</text>
+  <text x="228.05" y="78.35" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-2.93 228.05 78.35)">mx_reply</text>
+  <text x="389.84" y="97.27" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(2.44 389.84 97.27)">mx_reply</text>
+  <text x="332.74" y="184" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(1.63 332.74 184)">mx_release</text>
+  <text x="214.29" y="183.74" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(2.93 214.29 183.74)">mx_release</text>
+  <text x="152.1" y="186.31" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(7.29 152.1 186.31)">mx_release</text>
+  <text x="322.12" y="277.36" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(4.88 322.12 277.36)">mx_release</text>
+  <text x="162" y="262.27" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-6.33 162 262.27)">mx_release</text>
+  <text x="384.31" y="282.08" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(4.63 384.31 282.08)">mx_release</text>
+  <text x="213.71" y="348.5" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-2.44 213.71 348.5)">mx_release</text>
+  <text x="502.15" y="365.94" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(5.36 502.15 365.94)">mx_release</text>
+  <text x="332.07" y="348.54" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-5.84 332.07 348.54)">mx_release</text>
+  <text x="383.96" y="436.94" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-2.44 383.96 436.94)">mx_release</text>
+  <text x="502.23" y="435.52" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-4.88 502.23 435.52)">mx_release</text>
+  <text x="321.47" y="436.57" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-1.79 321.47 436.57)">mx_release</text>
+  <text x="224.85" y="4405.12" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-2.44 224.85 4405.12)">mx_request</text>
+  <text x="392.56" y="4406.05" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-2.69 392.56 4406.05)">mx_request</text>
+  <text x="177.29" y="4419.78" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(2.69 177.29 4419.78)">mx_request</text>
+  <text x="110.83" y="4418.52" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(5.84 110.83 4418.52)">mx_request</text>
+  <text x="282" y="4418.93" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(6.33 282 4418.93)">mx_request</text>
+  <text x="504.71" y="4425.53" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(6.81 504.71 4425.53)">mx_request</text>
+  <text x="331.04" y="4407.21" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-6.81 331.04 4407.21)">mx_request</text>
+  <text x="332.18" y="4425.96" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(2.44 332.18 4425.96)">mx_request</text>
+  <text x="515.78" y="4407.27" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-8.25 515.78 4407.27)">mx_request</text>
+  <text x="170.38" y="4408.7" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-8.73 170.38 4408.7)">mx_request</text>
+  <text x="392.09" y="4426.81" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(4.63 392.09 4426.81)">mx_request</text>
+  <text x="382.51" y="4407.98" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-3.09 382.51 4407.98)">mx_request</text>
+  <text x="218.56" y="4439.22" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(3.9 218.56 4439.22)">mx_reply</text>
+  <text x="374.18" y="4437.53" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(2.93 374.18 4437.53)">mx_reply</text>
+  <text x="218.3" y="4424.75" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-3.42 218.3 4424.75)">mx_reply</text>
+  <text x="113.2" y="4431.46" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-7.29 113.2 4431.46)">mx_reply</text>
+  <text x="351.68" y="4421.92" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-5.36 351.68 4421.92)">mx_reply</text>
+  <text x="319.27" y="4443.98" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(6.81 319.27 4443.98)">mx_reply</text>
+  <text x="559.73" y="4420.73" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-7.29 559.73 4420.73)">mx_reply</text>
+  <text x="270.66" y="4427.66" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-1.63 270.66 4427.66)">mx_reply</text>
+  <text x="502" y="4449.13" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(6.33 502 4449.13)">mx_reply</text>
+  <text x="161.69" y="4453.44" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(8.25 161.69 4453.44)">mx_reply</text>
+  <text x="446.76" y="4430.46" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-2.44 446.76 4430.46)">mx_reply</text>
+  <text x="369.46" y="4453.44" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(2.12 369.46 4453.44)">mx_reply</text>
+  <text x="321.46" y="4509.06" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-2.6 321.46 4509.06)">mx_release</text>
+  <text x="501.69" y="4509.36" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-8.25 501.69 4509.36)">mx_release</text>
+  <text x="383.94" y="4512.58" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-4.39 383.94 4512.58)">mx_release</text>
+  <text x="332.66" y="4620.28" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(2.12 332.66 4620.28)">mx_release</text>
+  <text x="152.09" y="4620.41" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(7.29 152.09 4620.41)">mx_release</text>
+  <text x="214.29" y="4621.35" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(4.39 214.29 4621.35)">mx_release</text>
+  <text x="384.3" y="4712.68" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(3.17 384.3 4712.68)">mx_release</text>
+  <text x="322.1" y="4714.02" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(6.81 322.1 4714.02)">mx_release</text>
+  <text x="161.92" y="4697.11" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-6.81 161.92 4697.11)">mx_release</text>
+  <text x="503" y="4797.91" font-size="11" text-anchor="middle" fill="#878f9b" font-family="Inter, ui-sans-serif, system-ui, sans-serif">mx_release</text>
+  <text x="281.64" y="4779.69" font-size="11" text-anchor="middle" fill="#878f9b" font-family="Inter, ui-sans-serif, system-ui, sans-serif">mx_release</text>
+  <text x="343.79" y="4779.69" font-size="11" text-anchor="middle" fill="#878f9b" font-family="Inter, ui-sans-serif, system-ui, sans-serif">mx_release</text>
+</svg>

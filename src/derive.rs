@@ -44,6 +44,12 @@ impl Liveness {
         self.transitions.iter().find(|(t, alive)| !*alive && *t >= from).map(|(t, _)| *t)
     }
 
+    /// Every change of participation, in time order. The lifeline is drawn in the stretches
+    /// between these.
+    pub fn transitions(&self) -> Vec<(Tick, bool)> {
+        self.transitions.clone()
+    }
+
     fn push(&mut self, t: Tick, alive: bool) {
         self.transitions.push((t, alive));
         self.transitions.sort_by_key(|(t, _)| *t);
