@@ -305,7 +305,7 @@ fn relax(rails: &mut [Rail], lanes: &[f64], rules: &[f64], fixed: &[(f64, f64, f
             let len = (dx * dx + dy * dy).sqrt().max(1e-6);
             let (ux, uy) = (dx / len, dy / len);
 
-            let mut repel = |cx: f64, cy: f64, w: f64, h: f64, weight: f64, push: &mut f64| {
+            let repel = |cx: f64, cy: f64, w: f64, h: f64, weight: f64, push: &mut f64| {
                 let ox = (rails[i].w + w) * 0.5 + 4.0 - (ci.0 - cx).abs();
                 let oy = (rails[i].h + h) * 0.5 + 2.0 - (ci.1 - cy).abs();
                 if ox <= 0.0 || oy <= 0.0 {
@@ -399,15 +399,46 @@ pub fn build_with(
     let lanes: Vec<f64> = doc.participants.iter().filter_map(|p| lane_x.get(p.as_str()).copied()).collect();
     let x_of = |n: &str| lane_x.get(n).copied().unwrap_or(MARGIN_L);
 
+    // A caption needs a line of its own above the lane headings, and nothing else moves when
+    // there is none.
+    let caption_h = if doc.title.is_some() { 26.0 } else { 0.0 };
+    // Bodies print in the right margin, so the margin has to be wide enough for the widest line
+    // of the widest one. Measured rather than guessed: a body is whatever the protocol put there.
+    let body_w = if d.bodies {
+        doc.events
+            .iter()
+            .filter_map(|e| e.detail.as_ref())
+            .flat_map(|b| b.lines())
+            .map(|l| font.width(l.trim(), LABEL_SIZE))
+            .fold(0.0f64, f64::max)
+    } else {
+        0.0
+    };
     let width = MARGIN_L
         + (doc.participants.len().max(1) as f64 - 1.0) * d.lane_pitch
-        + MARGIN_R;
+        + MARGIN_R
+        + if body_w > 0.0 { body_w + 24.0 } else { 0.0 };
     let top = HEADER;
     let bottom = axis.height();
     let height = bottom + FOOTER;
 
     let mut prims: Vec<Prim> = Vec::new();
     let mut rails: Vec<Rail> = Vec::new();
+
+    if let Some(t) = &doc.title {
+        prims.push(Prim::Text {
+            x: MARGIN_L - 34.0,
+            y: 22.0,
+            text: t.clone(),
+            size: 15.0,
+            anchor: Anchor::Start,
+            fill: pal.ink,
+            opacity: 1.0,
+            rotate: 0.0,
+            mono: false,
+            tag: Tag { event: None, role: "title".into(), detail: None },
+        });
+    }
     // Point labels sit beside their mark rather than on a rail, so they cannot relax along
     // anything — two events at the same instant on the same lane would print on top of each other.
     // Collected here and dodged downward once the whole set is known.
@@ -418,7 +449,11 @@ pub fn build_with(
     };
 
     // ---- the time gutter -------------------------------------------------
-    gutter(&mut prims, &axis, d, &pal, width);
+    // Rules span the lanes, not the page: with bodies on, the page is wider than the plot.
+    let plot_right = MARGIN_L
+        + (doc.participants.len().max(1) as f64 - 1.0) * d.lane_pitch
+        + 34.0;
+    gutter(&mut prims, &axis, d, &pal, plot_right);
 
     // ---- lifelines -------------------------------------------------------
     for p in &doc.participants {
@@ -593,8 +628,11 @@ pub fn build_with(
             // visible as it is on any other arrow.
             let bulge = d.lane_pitch * 0.28;
             prims.push(Prim::Path {
+                // Space-separated rather than comma-separated. SVG accepts both, and commas
+                // would make the coordinates unreadable to anything that walks the tokens —
+                // including the shift that moves a picture down to make room for a caption.
                 d: format!(
-                    "M {} {} C {} {}, {} {}, {} {}",
+                    "M {} {} C {} {} {} {} {} {}",
                     n(x1),
                     n(y1),
                     n(x1 + bulge),
@@ -673,7 +711,7 @@ pub fn build_with(
             prims.push(Prim::Line {
                 x1: MARGIN_L - 34.0,
                 y1: y,
-                x2: width - MARGIN_R + 34.0,
+                x2: plot_right,
                 y2: y,
                 stroke: Stroke {
                     color: colour,
@@ -703,9 +741,32 @@ pub fn build_with(
             let (tx, anchor, ty) = match xs.first() {
                 Some(x) => (x + size + 6.0, Anchor::Start, y + font.cap_height(LABEL_SIZE) * 0.5),
                 // A line across every lane carries its label above itself, not through it.
-                None => (width - MARGIN_R + 30.0, Anchor::End, y - 5.0),
+                None => (plot_right - 4.0, Anchor::End, y - 5.0),
             };
             pins.push((tx, ty, anchor, text, colour, opacity, tag));
+        }
+    }
+
+    // ---- detail blocks, when the style sheet asks for them ----------------
+    //
+    // Off by default because a body is usually several lines of JSON and a page of them buries the
+    // diagram. On, they are printed in the right margin beside the instant they belong to, which is
+    // the only place on a space-time diagram with room for several lines.
+    if d.bodies {
+        for (i, e) in doc.events.iter().enumerate() {
+            let Some(body) = &e.detail else { continue };
+            let y = axis.y(e.time);
+            for (k, line) in body.lines().enumerate() {
+                pins.push((
+                    plot_right + 16.0,
+                    y + font.cap_height(LABEL_SIZE) * 0.5 + k as f64 * LABEL_SIZE * 1.15,
+                    Anchor::Start,
+                    line.trim().to_string(),
+                    pal.faint,
+                    1.0,
+                    Tag { event: Some(i), role: "body".into(), detail: Some(body.clone()) },
+                ));
+            }
         }
     }
 
@@ -795,9 +856,17 @@ pub fn build_with(
         });
     }
 
+    // Everything was laid out as though there were no caption; shifting once here is simpler than
+    // threading an offset through every placement, and cannot be got wrong in one place only.
+    if caption_h > 0.0 {
+        for p in &mut prims {
+            shift(p, caption_h);
+        }
+    }
+
     Picture {
         width,
-        height,
+        height: height + caption_h,
         background: pal.background,
         prims,
         title: doc.title.clone(),
@@ -805,7 +874,44 @@ pub fn build_with(
     }
 }
 
-fn gutter(prims: &mut Vec<Prim>, axis: &Axis3, d: &Diagram, pal: &Palette, width: f64) {
+/// Move one primitive down the page. The caption is the only thing that needs this, and it needs
+/// it after everything else has been placed.
+fn shift(p: &mut Prim, dy: f64) {
+    match p {
+        Prim::Line { y1, y2, .. } => {
+            *y1 += dy;
+            *y2 += dy;
+        }
+        Prim::Rect { y, .. } | Prim::Text { y, .. } => *y += dy,
+        Prim::Circle { cy, .. } => *cy += dy,
+        Prim::Polygon { points, .. } => {
+            for (_, y) in points.iter_mut() {
+                *y += dy;
+            }
+        }
+        Prim::Path { d, .. } => {
+            // Path data is already absolute and written as `CMD x y x y …`, so every second
+            // number after a command letter is a y. A command resets the pairing.
+            let mut seen = 0usize;
+            let rebuilt: Vec<String> = d
+                .split_whitespace()
+                .map(|part| match part.parse::<f64>() {
+                    Ok(v) => {
+                        seen += 1;
+                        crate::picture::n(if seen % 2 == 0 { v + dy } else { v })
+                    }
+                    Err(_) => {
+                        seen = 0;
+                        part.to_string()
+                    }
+                })
+                .collect();
+            *d = rebuilt.join(" ");
+        }
+    }
+}
+
+fn gutter(prims: &mut Vec<Prim>, axis: &Axis3, d: &Diagram, pal: &Palette, plot_right: f64) {
     let label = |prims: &mut Vec<Prim>, t: Tick, y: f64| {
         prims.push(Prim::Text {
             x: MARGIN_L - 42.0,
@@ -824,7 +930,7 @@ fn gutter(prims: &mut Vec<Prim>, axis: &Axis3, d: &Diagram, pal: &Palette, width
         prims.push(Prim::Line {
             x1: MARGIN_L - 34.0,
             y1: y,
-            x2: width - MARGIN_R + 34.0,
+            x2: plot_right,
             y2: y,
             stroke: Stroke { color: pal.rule, width: 1.0, dash, opacity: 0.55 },
             head: false,

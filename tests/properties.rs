@@ -385,3 +385,101 @@ fn both_themes_paint_their_own_background() {
     assert!(dark.contains("fill=\"#0e1116\""), "dark should paint its own ground");
     let _ = Theme::Light;
 }
+
+// ---------------------------------------------------------------------------
+// The two things a document can say that the style sheet only shows on request
+// ---------------------------------------------------------------------------
+
+#[test]
+fn a_title_is_drawn_as_a_caption_and_costs_a_line_when_there_is_one() {
+    let with = picture("title \"A relay\"\n0 n0 deliver", None, true);
+    let without = picture("0 n0 deliver", None, true);
+    assert!(
+        boxes(&with).iter().any(|(_, _, _, _, t)| t == "A relay"),
+        "the caption was not drawn"
+    );
+    assert!(with.height > without.height, "the caption should make room for itself");
+    // And nothing else moves relative to it: the whole picture shifted by one line.
+    let dy = with.height - without.height;
+    assert!(dy > 10.0 && dy < 40.0, "the caption took {dy}px");
+}
+
+/// Shifting for the caption must move every kind of primitive, including a path, or a self-loop
+/// would detach from the lane it belongs to.
+#[test]
+fn the_caption_shift_moves_paths_too() {
+    let with = picture("title \"t\"\n100 n0 -> n0 .retry +20", None, true);
+    let without = picture("100 n0 -> n0 .retry +20", None, true);
+    let path_y = |p: &Picture| -> Vec<f64> {
+        p.prims
+            .iter()
+            .filter_map(|q| match q {
+                Prim::Path { d, .. } => Some(
+                    d.split_whitespace()
+                        .filter_map(|t| t.parse::<f64>().ok())
+                        .skip(1)
+                        .step_by(2)
+                        .fold(0.0, f64::max),
+                ),
+                _ => None,
+            })
+            .collect()
+    };
+    let (a, b) = (path_y(&with), path_y(&without));
+    assert_eq!(a.len(), b.len());
+    assert!(!a.is_empty(), "the self-loop should be a path");
+    for (x, y) in a.iter().zip(&b) {
+        assert!(x > y, "the path did not move with everything else: {x} against {y}");
+    }
+}
+
+/// Bodies are off by default, because a page of JSON buries the diagram.
+#[test]
+fn a_detail_block_is_drawn_only_when_the_style_sheet_asks() {
+    let doc = "0 n0 -> n1 .rb +10 {\n  {\"seq\": 4}\n}";
+    let off = picture(doc, None, true);
+    assert!(boxes(&off).iter().all(|(_, _, _, _, t)| !t.contains("seq")));
+
+    let on = picture(doc, Some("style diagram bodies=on"), true);
+    assert!(
+        boxes(&on).iter().any(|(_, _, _, _, t)| t.contains("seq")),
+        "bodies=on should print the block"
+    );
+}
+
+#[test]
+fn a_multi_line_body_prints_every_line() {
+    let on = picture(
+        "0 n0 -> n1 .rb +10 {\n  one\n  two\n  three\n}",
+        Some("style diagram bodies=on"),
+        true,
+    );
+    for want in ["one", "two", "three"] {
+        assert!(
+            boxes(&on).iter().any(|(_, _, _, _, t)| t == want),
+            "{want} is missing from the page"
+        );
+    }
+}
+
+/// A body prints in the right margin, so the page has to be wide enough for the widest line of the
+/// widest one. Measured rather than guessed, because a body is whatever the protocol put there.
+#[test]
+fn a_long_body_widens_the_page_rather_than_running_off_it() {
+    let long = "x".repeat(90);
+    let doc = format!("0 n0 -> n1 .rb +10 {{\n  {long}\n}}");
+    let pic = picture(&doc, Some("style diagram bodies=on"), true);
+    let f = font::Font::embedded();
+    for (cx, _, w, _, t) in boxes(&pic) {
+        if t.starts_with("xxx") {
+            let right = cx + w * 0.5;
+            assert!(
+                right <= pic.width,
+                "the body runs {}px past the page edge",
+                right - pic.width
+            );
+        }
+    }
+    let narrow = picture("0 n0 -> n1 .rb +10", Some("style diagram bodies=on"), true);
+    assert!(pic.width > narrow.width + f.width(&long, 11.0) * 0.8);
+}
