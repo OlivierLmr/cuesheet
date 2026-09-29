@@ -1,6 +1,6 @@
 //! The command line, end to end.
 //!
-//! Three flags, and a message that names the closed set whenever one of them is wrong — a language
+//! Four flags, and a message that names the closed set whenever one of them is wrong — a language
 //! people write by hand is only as good as what it says when they get it wrong, and the same is
 //! true of the command that renders it.
 
@@ -131,4 +131,25 @@ fn png_renders_and_is_reproducible() {
     let (x, y) = (std::fs::read(&a).unwrap(), std::fs::read(&b).unwrap());
     assert_eq!(&x[..8], b"\x89PNG\r\n\x1a\n");
     assert_eq!(x, y, "the same document rasterised to different bytes");
+}
+
+/// `--open` is the flag a student reaches for, so `--help` has to mention it.
+#[test]
+fn the_usage_names_every_flag_including_open() {
+    let o = run(&["--help"]);
+    assert!(o.status.success(), "{}", err(&o));
+    let u = out(&o);
+    for f in ["--style", "--out", "--format", "--open"] {
+        assert!(u.contains(f), "usage never mentions {f}:\n{u}");
+    }
+}
+
+/// The closed set in the error message has to keep pace with the set itself, or it teaches a lie.
+#[test]
+fn an_unknown_flag_names_all_four() {
+    let o = run(&["render", "examples/partition.st", "--zoom"]);
+    assert!(!o.status.success());
+    let e = err(&o);
+    assert!(e.contains("four"), "{e}");
+    assert!(e.contains("--open"), "{e}");
 }
