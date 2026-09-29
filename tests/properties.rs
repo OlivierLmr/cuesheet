@@ -541,3 +541,195 @@ fn every_pseudo_class_is_reachable_from_a_selector() {
         );
     }
 }
+
+// ---------------------------------------------------------------------------
+// Placement: one engine, two kinds of freedom
+// ---------------------------------------------------------------------------
+
+/// Distance from a point to a segment, and where on it the nearest point was.
+fn nearest(p: (f64, f64), s: (f64, f64, f64, f64)) -> (f64, (f64, f64)) {
+    let (dx, dy) = (s.2 - s.0, s.3 - s.1);
+    let l2 = dx * dx + dy * dy;
+    let t = if l2 < 1e-9 { 0.0 } else { (((p.0 - s.0) * dx + (p.1 - s.1) * dy) / l2).clamp(0.0, 1.0) };
+    let c = (s.0 + dx * t, s.1 + dy * t);
+    (((p.0 - c.0).powi(2) + (p.1 - c.1).powi(2)).sqrt(), c)
+}
+
+fn slanted(pic: &Picture) -> Vec<(f64, f64, f64, f64)> {
+    pic.prims
+        .iter()
+        .filter_map(|p| match p {
+            Prim::Line { x1, y1, x2, y2, .. } if (x2 - x1).abs() > 1.0 && (y2 - y1).abs() > 1.0 => {
+                Some((*x1, *y1, *x2, *y2))
+            }
+            _ => None,
+        })
+        .collect()
+}
+
+/// Every message label sits on the same side of its arrow, whichever way the arrow points.
+///
+/// They used not to: the perpendicular was taken straight from the direction vector, so a leftward
+/// arrow flipped it and the page ended up with some labels above their line and some below, for no
+/// reason a reader could see. Tested on a pair that differs only in direction, because in a busy
+/// picture the segment nearest a label is often not the one it belongs to.
+#[test]
+fn a_label_sits_above_its_arrow_whichever_way_the_arrow_points() {
+    for doc in ["0 n0 -> n1 .a +10\n50 run end", "0 n1 -> n0 .a +10\n50 run end"] {
+        let pic = picture(doc, Some(STYLE), true);
+        let seg = slanted(&pic).into_iter().next().expect("one arrow");
+        let mid = ((seg.0 + seg.2) * 0.5, (seg.1 + seg.3) * 0.5);
+        let label = pic
+            .prims
+            .iter()
+            .find_map(|p| match p {
+                Prim::Text { x, y, text, .. } if text == "a" => Some((*x, *y)),
+                _ => None,
+            })
+            .expect("the arrow is labelled");
+        // Same x, so the comparison is purely which side of the line it went.
+        let on_line = seg.1 + (seg.3 - seg.1) * ((label.0 - seg.0) / (seg.2 - seg.0));
+        assert!(
+            label.1 < on_line,
+            "{doc:?}: the label sits below its arrow ({} against {on_line})",
+            label.1
+        );
+        let _ = mid;
+    }
+}
+
+/// A pinned label may move, but only so far: it belongs to the instant it names, and one that
+/// drifted would stop naming it.
+///
+/// A pinned label is the one anchored beside a mark, which is what the anchor says — a message
+/// label is centred on its rail. Rotation cannot be used to tell them apart, because a
+/// near-horizontal arrow has none.
+#[test]
+fn a_pinned_label_stays_near_the_instant_it_belongs_to() {
+    let pic = picture(RUNS[3], Some(STYLE), true);
+    let lanes: Vec<f64> = pic
+        .prims
+        .iter()
+        .filter_map(|p| match p {
+            Prim::Line { x1, x2, y1, y2, .. } if (x1 - x2).abs() < 0.01 && (y2 - y1).abs() > 40.0 => Some(*x1),
+            _ => None,
+        })
+        .collect();
+    let mut checked = 0;
+    for p in &pic.prims {
+        let Prim::Text { x, text, anchor, tag, .. } = p else { continue };
+        if *anchor == Anchor::Middle || tag.event.is_none() || tag.role == "body" {
+            continue;
+        }
+        let d = lanes
+            .iter()
+            .map(|l| (x - l).abs())
+            .fold(f64::INFINITY, f64::min);
+        assert!(d < 60.0, "a pinned label sits {d}px from any lane: {text:?}");
+        checked += 1;
+    }
+    assert!(checked >= 8, "only {checked} pinned labels were checked");
+}
+
+/// A label pushed off the edge is not placed, it is lost.
+#[test]
+fn no_label_runs_off_the_page() {
+    let f = font::Font::embedded();
+    for (src, name) in RUNS.iter().zip(NAMES) {
+        let pic = picture(src, Some(STYLE), true);
+        for p in &pic.prims {
+            let Prim::Text { x, text, size, anchor, rotate, .. } = p else { continue };
+            if rotate.abs() > 0.01 {
+                continue; // a rotated box is not axis-aligned; its centre is checked elsewhere
+            }
+            let w = f.width(text, *size);
+            let left = match anchor {
+                Anchor::Start => *x,
+                Anchor::Middle => x - w * 0.5,
+                Anchor::End => x - w,
+            };
+            assert!(left >= -1.0, "{name}: {text:?} starts at {left}, off the left edge");
+            assert!(
+                left + w <= pic.width + 1.0,
+                "{name}: {text:?} ends at {}, past the right edge {}",
+                left + w,
+                pic.width
+            );
+        }
+    }
+}
+
+/// The fourth kind of overlap the design names, and the one most easily forgotten: an arrow is not
+/// a box, so it does not show up in a box-against-box test.
+#[test]
+fn knowing_about_the_arrows_keeps_labels_off_them() {
+    let count_on = |pic: &Picture| {
+        let segs = slanted(pic);
+        pic.prims
+            .iter()
+            .filter(|p| matches!(p, Prim::Text { rotate, .. } if rotate.abs() < 0.01))
+            .filter(|p| {
+                let Prim::Text { x, y, .. } = p else { return false };
+                segs.iter().any(|s| nearest((*x, *y - 4.0), *s).0 < 3.0)
+            })
+            .count()
+    };
+    let with = count_on(&picture(RUNS[0], Some(STYLE), true));
+    let without = count_on(&picture(RUNS[0], Some(STYLE), false));
+    assert!(
+        with <= without,
+        "the pass left {with} labels on an arrow against {without} without it"
+    );
+}
+
+/// A bare arrowhead says too little about where something came from.
+#[test]
+fn the_arrow_mark_draws_a_shaft_and_the_chevron_does_not() {
+    let arrow = picture("10 n0 asked req\n200 run end", Some("style asked mark=arrow"), true);
+    let shafts = arrow
+        .prims
+        .iter()
+        .filter(|p| matches!(p, Prim::Line { head: true, x1, x2, .. } if (x2 - x1).abs() > 4.0))
+        .count();
+    assert!(shafts > 0, "the arrow mark drew no shaft");
+
+    let chevron = picture("10 n0 asked req\n200 run end", Some("style asked mark=chevron"), true);
+    assert!(
+        chevron.prims.iter().any(|p| matches!(p, Prim::Polygon { .. })),
+        "the chevron should still be a bare head"
+    );
+}
+
+/// The mark faces the way its label went, so the two read as one thing.
+#[test]
+fn the_arrow_mark_faces_the_side_its_label_settled_on() {
+    // n0 is the leftmost lane, so its label has nowhere to go but right, and the shaft follows.
+    let pic = picture("10 n0 asked a_long_enough_label\n200 run end", Some("style asked mark=arrow"), true);
+    let lane = pic
+        .prims
+        .iter()
+        .find_map(|p| match p {
+            Prim::Line { x1, x2, y1, y2, .. } if (x1 - x2).abs() < 0.01 && (y2 - y1).abs() > 40.0 => Some(*x1),
+            _ => None,
+        })
+        .expect("a lifeline");
+    let shaft = pic
+        .prims
+        .iter()
+        .find_map(|p| match p {
+            Prim::Line { x1, x2, head: true, .. } if (x2 - x1).abs() > 4.0 => Some((*x1, *x2)),
+            _ => None,
+        })
+        .expect("a shaft");
+    let label_x = pic
+        .prims
+        .iter()
+        .find_map(|p| match p {
+            Prim::Text { x, text, .. } if text == "a_long_enough_label" => Some(*x),
+            _ => None,
+        })
+        .expect("a label");
+    let label_side = (label_x - lane).signum();
+    let shaft_side = (shaft.0 - lane).signum();
+    assert_eq!(label_side, shaft_side, "the shaft points away from its own label");
+}

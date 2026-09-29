@@ -175,198 +175,321 @@ fn palette(theme: Theme) -> Palette {
     }
 }
 
-/// A label riding a rail, before relaxation has decided where along it to sit.
-struct Rail {
+/// Where a label may go, and how much room it has to move.
+///
+/// Both kinds have the same shape: one continuous degree of freedom, and one discrete choice of
+/// side. That is what lets a message label and a label beside a mark relax against each other
+/// rather than colliding freely because neither knows the other exists.
+enum Anchorage {
+    /// Along an arrow. The continuous freedom is how far along.
+    Rail { a: (f64, f64), b: (f64, f64), f: f64 },
+    /// Beside a mark on a lane. The continuous freedom is a small vertical nudge — small because
+    /// a label belongs to the instant it names, and one that drifts stops naming it.
+    Pin { x: f64, y: f64, dy: f64, gap: f64 },
+}
+
+/// How far a pinned label may slide from the instant it belongs to.
+const PIN_SLACK: f64 = 15.0;
+const MIN_F: f64 = 0.12;
+const MAX_F: f64 = 0.88;
+
+struct Placement {
     text: String,
-    /// Start and end of the line the label rides.
-    a: (f64, f64),
-    b: (f64, f64),
-    /// Parameter along the rail, and where it would rather be.
-    f: f64,
-    pref: f64,
     w: f64,
     h: f64,
     fill: Color,
     opacity: f64,
     tag: Tag,
+    /// Ride the rail's angle rather than sitting upright.
     rotate: bool,
+    /// Which side of the line, or of the lane. `+1` is the preferred one.
+    side: f64,
+    anchorage: Anchorage,
 }
 
-impl Rail {
-    fn at(&self, f: f64) -> (f64, f64) {
-        (self.a.0 + (self.b.0 - self.a.0) * f, self.a.1 + (self.b.1 - self.a.1) * f)
-    }
+impl Placement {
+    /// Centre of the label's box, which is what everything else is measured against.
     fn centre(&self) -> (f64, f64) {
-        // Sit just off the line rather than on it, on the side the arrow is travelling away from.
-        let (x, y) = self.at(self.f);
-        let (dx, dy) = (self.b.0 - self.a.0, self.b.1 - self.a.1);
-        let len = (dx * dx + dy * dy).sqrt().max(1e-6);
-        let (nx, ny) = (-dy / len, dx / len);
-        let off = self.h * 0.72;
-        (x + nx * off, y + ny * off)
+        match &self.anchorage {
+            Anchorage::Rail { a, b, f } => {
+                let (x, y) = (a.0 + (b.0 - a.0) * f, a.1 + (b.1 - a.1) * f);
+                let (nx, ny) = self.normal();
+                let off = self.h * 0.72;
+                (x + nx * off * self.side, y + ny * off * self.side)
+            }
+            Anchorage::Pin { x, y, dy, gap } => {
+                (x + self.side * (gap + self.w * 0.5), y + dy)
+            }
+        }
     }
+
+    /// The perpendicular a rail label is offset along, always pointing *up* the page.
+    ///
+    /// Taking it straight from the direction vector is what used to put some labels above their
+    /// arrow and some below: a leftward arrow flips the perpendicular. Pinning the sign to the
+    /// page rather than to the arrow makes the default side the same everywhere, and `side` is
+    /// then a decision rather than an accident.
+    fn normal(&self) -> (f64, f64) {
+        match &self.anchorage {
+            Anchorage::Rail { a, b, .. } => {
+                let (dx, dy) = (b.0 - a.0, b.1 - a.1);
+                let len = (dx * dx + dy * dy).sqrt().max(1e-6);
+                let (nx, ny) = (-dy / len, dx / len);
+                if ny > 0.0 {
+                    (-nx, -ny)
+                } else {
+                    (nx, ny)
+                }
+            }
+            _ => (0.0, -1.0),
+        }
+    }
+
+    fn param(&self) -> f64 {
+        match &self.anchorage {
+            Anchorage::Rail { f, .. } => *f,
+            Anchorage::Pin { dy, .. } => *dy,
+        }
+    }
+
+    fn set_param(&mut self, v: f64) {
+        match &mut self.anchorage {
+            Anchorage::Rail { f, .. } => *f = v.clamp(MIN_F, MAX_F),
+            Anchorage::Pin { dy, .. } => *dy = v.clamp(-PIN_SLACK, PIN_SLACK),
+        }
+    }
+
+    /// Where it would rather be, and how hard it is pulled back there.
+    fn home(&self) -> f64 {
+        match &self.anchorage {
+            Anchorage::Rail { .. } => 0.5,
+            Anchorage::Pin { .. } => 0.0,
+        }
+    }
+
     fn angle(&self) -> f64 {
         if !self.rotate {
             return 0.0;
         }
-        let (dx, dy) = (self.b.0 - self.a.0, self.b.1 - self.a.1);
-        let mut deg = dy.atan2(dx).to_degrees();
-        // Keep text the right way up: an arrow pointing left would otherwise write upside down.
-        if deg > 90.0 {
-            deg -= 180.0;
-        } else if deg < -90.0 {
-            deg += 180.0;
+        match &self.anchorage {
+            Anchorage::Rail { a, b, .. } => {
+                let mut deg = (b.1 - a.1).atan2(b.0 - a.0).to_degrees();
+                // Keep text the right way up: an arrow pointing left would write upside down.
+                if deg > 90.0 {
+                    deg -= 180.0;
+                } else if deg < -90.0 {
+                    deg += 180.0;
+                }
+                deg
+            }
+            _ => 0.0,
         }
-        deg
+    }
+
+    /// Where the text is drawn and how it is anchored, once a side has been settled on.
+    fn text_at(&self) -> (f64, f64, Anchor) {
+        match &self.anchorage {
+            Anchorage::Rail { .. } => {
+                let c = self.centre();
+                (c.0, c.1, Anchor::Middle)
+            }
+            Anchorage::Pin { x, y, dy, gap } => {
+                let anchor = if self.side > 0.0 { Anchor::Start } else { Anchor::End };
+                (x + self.side * gap, y + dy, anchor)
+            }
+        }
     }
 }
 
-/// How bad an arrangement is: overlap between label boxes, plus labels sitting on a lane.
-///
-/// Continuous rather than a count, so it can guide the search rather than only judge it.
-fn cost(rails: &[Rail], lanes: &[f64], rules: &[f64], fixed: &[(f64, f64, f64, f64)]) -> f64 {
-    let mut c = 0.0;
-    for i in 0..rails.len() {
-        let ci = rails[i].centre();
-        for j in (i + 1)..rails.len() {
-            let cj = rails[j].centre();
-            let ox = (rails[i].w + rails[j].w) * 0.5 + 4.0 - (ci.0 - cj.0).abs();
-            let oy = (rails[i].h + rails[j].h) * 0.5 + 2.0 - (ci.1 - cj.1).abs();
-            if ox > 0.0 && oy > 0.0 {
-                c += ox.min(oy);
-            }
-        }
-        for (fx, fy, fw, fh) in fixed {
-            let ox = (rails[i].w + fw) * 0.5 + 4.0 - (ci.0 - fx).abs();
-            let oy = (rails[i].h + fh) * 0.5 + 2.0 - (ci.1 - fy).abs();
-            if ox > 0.0 && oy > 0.0 {
-                c += ox.min(oy);
-            }
-        }
-        for x in lanes {
-            let over = rails[i].w * 0.5 + 6.0 - (ci.0 - x).abs();
-            if over > 0.0 {
-                c += over * 0.6;
-            }
-        }
-        for y in rules {
-            let over = rails[i].h * 0.5 - (ci.1 - y).abs();
-            if over > 0.0 {
-                c += over * 0.5;
-            }
-        }
-        // A weak preference for the middle of the arrow, so a label with nothing to avoid stays
-        // where the reader expects it rather than drifting to an end.
-        c += (rails[i].f - rails[i].pref).abs() * 2.0;
+/// How much two boxes overlap, as a single number. Zero when they are clear of each other.
+fn overlap(a: (f64, f64, f64, f64), b: (f64, f64, f64, f64)) -> f64 {
+    let ox = (a.2 + b.2) * 0.5 + 4.0 - (a.0 - b.0).abs();
+    let oy = (a.3 + b.3) * 0.5 + 2.0 - (a.1 - b.1).abs();
+    if ox > 0.0 && oy > 0.0 {
+        ox.min(oy)
+    } else {
+        0.0
     }
-    c
 }
 
-/// Push labels along their own rails until they stop overlapping, or until the budget runs out and
-/// they settle at least-bad.
+struct Obstacles<'a> {
+    lanes: &'a [f64],
+    rules: &'a [f64],
+    fixed: &'a [(f64, f64, f64, f64)],
+    /// The page. A label pushed off the edge is not placed, it is lost, so leaving is expensive.
+    left: f64,
+    right: f64,
+    /// The arrows themselves. The fourth kind of overlap, and the one most easily forgotten,
+    /// because an arrow is not a box and so does not show up in a box-against-box test.
+    segments: &'a [(f64, f64, f64, f64)],
+}
+
+/// Distance from a point to a line segment.
+fn dist_to_segment(p: (f64, f64), s: (f64, f64, f64, f64)) -> f64 {
+    let (dx, dy) = (s.2 - s.0, s.3 - s.1);
+    let len2 = dx * dx + dy * dy;
+    let t = if len2 <= 1e-9 {
+        0.0
+    } else {
+        (((p.0 - s.0) * dx + (p.1 - s.1) * dy) / len2).clamp(0.0, 1.0)
+    };
+    let (cx, cy) = (s.0 + dx * t, s.1 + dy * t);
+    ((p.0 - cx).powi(2) + (p.1 - cy).powi(2)).sqrt()
+}
+
+/// What one placement costs where it currently sits.
+fn local_cost(i: usize, ps: &[Placement], obs: &Obstacles) -> f64 {
+    let p = &ps[i];
+    let c = p.centre();
+    let me = (c.0, c.1, p.w, p.h);
+    let mut cost = 0.0;
+
+    for (j, q) in ps.iter().enumerate() {
+        if j == i {
+            continue;
+        }
+        let d = q.centre();
+        cost += overlap(me, (d.0, d.1, q.w, q.h));
+    }
+    for f in obs.fixed {
+        cost += overlap(me, *f);
+    }
+    for x in obs.lanes {
+        // A label beside a mark is *meant* to sit near its own lane, so only the lanes it does not
+        // belong to are in its way.
+        if let Anchorage::Pin { x: own, .. } = &p.anchorage {
+            if (own - x).abs() < 1.0 {
+                continue;
+            }
+        }
+        let over = p.w * 0.5 + 6.0 - (c.0 - x).abs();
+        if over > 0.0 {
+            cost += over * 0.6;
+        }
+    }
+    for y in obs.rules {
+        let over = p.h * 0.5 - (c.1 - y).abs();
+        if over > 0.0 {
+            cost += over * 0.5;
+        }
+    }
+    // The arrows. A message label rides just clear of its own line by design, so the threshold is
+    // under that offset and its own arrow does not push it away from where it belongs.
+    let clear = p.h * 0.45;
+    for seg in obs.segments {
+        let d = dist_to_segment(c, *seg);
+        if d < clear {
+            cost += (clear - d) * 1.8;
+        }
+    }
+
+    // Off the page is not a placement. Weighted heavily, because every other cost here is a
+    // matter of degree and this one is a label the reader simply never sees.
+    let (l, r) = (c.0 - p.w * 0.5, c.0 + p.w * 0.5);
+    if l < obs.left {
+        cost += (obs.left - l) * 4.0;
+    }
+    if r > obs.right {
+        cost += (r - obs.right) * 4.0;
+    }
+
+    // Home, and a mild preference for the default side so nothing flips without a reason.
+    // A pinned label is pulled home gently: it may move, that is the point of it, and a strong
+    // spring would leave it sitting on an arrow rather than a few pixels from its mark. A rail
+    // label is pulled harder, because the middle of an arrow is where a reader looks for its name.
+    cost += (p.param() - p.home()).abs() * if matches!(p.anchorage, Anchorage::Pin { .. }) { 0.15 } else { 2.0 };
+    if p.side < 0.0 {
+        cost += 1.5;
+    }
+    cost
+}
+
+fn total_cost(ps: &[Placement], obs: &Obstacles) -> f64 {
+    (0..ps.len()).map(|i| local_cost(i, ps, obs)).sum()
+}
+
+/// Settle every label into somewhere it can be read.
 ///
-/// Each label has one degree of freedom — a parameter along its own arrow — which is what makes
-/// this tractable. Three properties are built in rather than retrofitted:
-///
-/// * **Deterministic.** A fixed number of passes, a fixed order, and no randomness anywhere, so
-///   byte-identical output survives.
-/// * **Terminating.** The budget is fixed, and a pass that moves nothing stops early.
-/// * **Stable.** The spring pulls each label back toward its preferred fraction, so a label with
-///   no conflict never moves and a small input change cannot cascade.
+/// Each has one continuous degree of freedom — how far along its arrow, or a small vertical nudge
+/// beside its mark — and one discrete one, which side. The continuous part is relaxed by gradient
+/// steps; the discrete part by trying the flip and keeping it only if it helps. Both run in a fixed
+/// order with no randomness, so the same document always settles the same way.
 ///
 /// It keeps the best arrangement it has seen, *including the one it started from*. A relaxation
-/// that cannot guarantee it improves on doing nothing should at least never make things worse —
-/// and on a dense page the naive version genuinely does, by pushing one label into the space of
-/// another it had not yet considered.
-fn relax(rails: &mut [Rail], lanes: &[f64], rules: &[f64], fixed: &[(f64, f64, f64, f64)]) {
-    const PASSES: usize = 120;
-    const MIN_F: f64 = 0.12;
-    const MAX_F: f64 = 0.88;
-
-    if rails.is_empty() {
+/// that cannot guarantee it improves on doing nothing should at least never make things worse — and
+/// on a dense page the naive version genuinely does, by pushing one label into the space of another
+/// it had not yet considered.
+fn relax(
+    ps: &mut [Placement],
+    lanes: &[f64],
+    rules: &[f64],
+    fixed: &[(f64, f64, f64, f64)],
+    bounds: (f64, f64),
+    segments: &[(f64, f64, f64, f64)],
+) {
+    const PASSES: usize = 140;
+    if ps.is_empty() {
         return;
     }
+    let obs = Obstacles { lanes, rules, fixed, left: bounds.0, right: bounds.1, segments };
 
-    let mut best: Vec<f64> = rails.iter().map(|r| r.f).collect();
-    let mut best_cost = cost(rails, lanes, rules, fixed);
+    let mut best: Vec<(f64, f64)> = ps.iter().map(|p| (p.param(), p.side)).collect();
+    let mut best_cost = total_cost(ps, &obs);
 
     for pass in 0..PASSES {
-        // Annealed: big steps to get out of the starting arrangement, small ones to settle into a
-        // local minimum rather than oscillate around it.
-        let step = 0.09 * (1.0 - pass as f64 / PASSES as f64).max(0.15);
-        let mut moved = 0f64;
+        let step = (1.0 - pass as f64 / PASSES as f64).max(0.15);
+        let mut moved = 0.0;
 
-        // Gauss-Seidel: each label moves before the next one is considered, so two labels cannot
-        // both step into the same gap on the strength of the same stale snapshot.
-        for i in 0..rails.len() {
-            let mut push = 0f64;
-            let ci = rails[i].centre();
-            let (dx, dy) = (rails[i].b.0 - rails[i].a.0, rails[i].b.1 - rails[i].a.1);
-            let len = (dx * dx + dy * dy).sqrt().max(1e-6);
-            let (ux, uy) = (dx / len, dy / len);
+        // Gauss-Seidel: each label moves before the next is considered, so two cannot both step
+        // into the same gap on the strength of one stale snapshot.
+        for i in 0..ps.len() {
+            // Discrete first: the side is a bigger move than a nudge, and choosing it badly makes
+            // the nudge meaningless.
+            let before = local_cost(i, ps, &obs);
+            ps[i].side = -ps[i].side;
+            if local_cost(i, ps, &obs) >= before {
+                ps[i].side = -ps[i].side;
+            }
 
-            let repel = |cx: f64, cy: f64, w: f64, h: f64, weight: f64, push: &mut f64| {
-                let ox = (rails[i].w + w) * 0.5 + 4.0 - (ci.0 - cx).abs();
-                let oy = (rails[i].h + h) * 0.5 + 2.0 - (ci.1 - cy).abs();
-                if ox <= 0.0 || oy <= 0.0 {
-                    return;
-                }
-                let d = (ci.0 - cx, ci.1 - cy);
-                let dlen = (d.0 * d.0 + d.1 * d.1).sqrt().max(1e-6);
-                // Only the component that this label's own rail can actually deliver. A label on a
-                // near-horizontal rail cannot fix a vertical overlap, and pretending otherwise is
-                // what makes the whole set jitter.
-                let along = ux * (d.0 / dlen) + uy * (d.1 / dlen);
-                *push += along * (ox.min(oy) / 24.0).min(1.0) * weight;
+            // Continuous: sample either way along the freedom and walk downhill. Cheaper to reason
+            // about than an analytic gradient through the overlap terms, and it cannot disagree
+            // with the cost it is minimising.
+            let reach = match ps[i].anchorage {
+                Anchorage::Rail { .. } => 0.08 * step,
+                Anchorage::Pin { .. } => 5.0 * step,
             };
-
-            for j in 0..rails.len() {
-                if j == i {
-                    continue;
-                }
-                let cj = rails[j].centre();
-                repel(cj.0, cj.1, rails[j].w, rails[j].h, 1.0, &mut push);
-            }
-            for (fx, fy, fw, fh) in fixed {
-                repel(*fx, *fy, *fw, *fh, 1.0, &mut push);
-            }
-            // A label sitting on somebody else's lifeline is the commonest collision on a
-            // space-time diagram, because the midpoint of a long arrow lands on a lane.
-            for x in lanes {
-                let over = rails[i].w * 0.5 + 6.0 - (ci.0 - x).abs();
-                if over > 0.0 {
-                    let dir = if ci.0 >= *x { 1.0 } else { -1.0 };
-                    push += ux * dir * (over / 24.0).min(1.0) * 0.8;
-                }
-            }
-            // And the gridlines, which run the other way. A slanted rail changes its label's y
-            // as well as its x, so moving along one is a way off a rule as well as off a lane.
-            for y in rules {
-                let over = rails[i].h * 0.5 - (ci.1 - y).abs();
-                if over > 0.0 {
-                    let dir = if ci.1 >= *y { 1.0 } else { -1.0 };
-                    push += uy * dir * (over / 12.0).min(1.0) * 0.9;
-                }
-            }
-            push += (rails[i].pref - rails[i].f) * 0.35;
-
-            let next = (rails[i].f + push * step).clamp(MIN_F, MAX_F);
-            moved += (next - rails[i].f).abs();
-            rails[i].f = next;
+            let here = ps[i].param();
+            let at = |ps: &mut [Placement], v: f64| {
+                ps[i].set_param(v);
+                local_cost(i, ps, &obs)
+            };
+            let c0 = at(ps, here);
+            let cm = at(ps, here - reach);
+            let cp = at(ps, here + reach);
+            let pick = if cm < c0 && cm <= cp {
+                here - reach
+            } else if cp < c0 {
+                here + reach
+            } else {
+                here
+            };
+            ps[i].set_param(pick);
+            moved += (pick - here).abs();
         }
 
-        let c = cost(rails, lanes, rules, fixed);
+        let c = total_cost(ps, &obs);
         if c < best_cost {
             best_cost = c;
-            best = rails.iter().map(|r| r.f).collect();
+            best = ps.iter().map(|p| (p.param(), p.side)).collect();
         }
         if moved < 1e-4 {
             break;
         }
     }
 
-    for (r, f) in rails.iter_mut().zip(best) {
-        r.f = f;
+    for (p, (v, side)) in ps.iter_mut().zip(best) {
+        p.set_param(v);
+        p.side = side;
     }
 }
 
@@ -423,7 +546,12 @@ pub fn build_with(
     let height = bottom + FOOTER;
 
     let mut prims: Vec<Prim> = Vec::new();
-    let mut rails: Vec<Rail> = Vec::new();
+    // Every label, of either sort, in one set — so a message label and one beside a mark
+    // relax against each other rather than colliding freely because neither knows the
+    // other exists.
+    let mut labels: Vec<Placement> = Vec::new();
+    // Marks whose shape depends on which side their label settled on, drawn after placement.
+    let mut sided: Vec<(usize, Mark, f64, f64, f64, Color, f64, Tag)> = Vec::new();
 
     if let Some(t) = &doc.title {
         prims.push(Prim::Text {
@@ -439,10 +567,10 @@ pub fn build_with(
             tag: Tag { event: None, role: "title".into(), detail: None },
         });
     }
-    // Point labels sit beside their mark rather than on a rail, so they cannot relax along
-    // anything — two events at the same instant on the same lane would print on top of each other.
-    // Collected here and dodged downward once the whole set is known.
-    let mut pins: Vec<(f64, f64, Anchor, String, Color, f64, Tag)> = Vec::new();
+
+
+
+
 
     let look = |kind: Option<&str>, classes: &[String], states: &[String]| Look {
         props: sheet.resolve(kind, classes, states),
@@ -651,7 +779,7 @@ pub fn build_with(
             prims.push(Prim::Line { x1, y1, x2: ex, y2: ey, stroke: stroke.clone(), head, tag: tag.clone() });
         }
         if cross {
-            prims.extend(mark_prims(Mark::Cross, ex, ey, 5.0, stroke.color, stroke.opacity, tag.clone()));
+            prims.extend(mark_prims(Mark::Cross, ex, ey, 5.0, stroke.color, stroke.opacity, 1.0, tag.clone()));
         }
 
         // An explicit label on the line wins; then the style sheet's default for the class; then
@@ -663,18 +791,16 @@ pub fn build_with(
             .or_else(|| e.classes.first().cloned());
         if let Some(text) = text {
             if !text.is_empty() {
-                rails.push(Rail {
+                labels.push(Placement {
                     w: font.width(&text, LABEL_SIZE),
                     h: LABEL_SIZE * 1.15,
                     text,
-                    a: (x1, y1),
-                    b: (ex, ey),
-                    f: 0.5,
-                    pref: 0.5,
                     fill: lk.props.color.unwrap_or(pal.ink),
                     opacity: lk.props.opacity.unwrap_or(1.0),
                     tag,
                     rotate: !m.is_self(),
+                    side: 1.0,
+                    anchorage: Anchorage::Rail { a: (x1, y1), b: (ex, ey), f: 0.5 },
                 });
             }
         }
@@ -723,27 +849,50 @@ pub fn build_with(
                 tag: tag.clone(),
             });
         }
-        for x in &xs {
-            prims.extend(mark_prims(
-                lk.props.mark.unwrap_or(Mark::Dot),
-                *x,
-                y,
-                size,
-                colour,
-                opacity,
-                tag.clone(),
-            ));
-        }
-
+        let mark = lk.props.mark.unwrap_or(Mark::Dot);
         let text =
             e.stated_label().or_else(|| lk.props.label.clone()).unwrap_or_else(|| p.kind.clone());
-        if !text.is_empty() {
-            let (tx, anchor, ty) = match xs.first() {
-                Some(x) => (x + size + 6.0, Anchor::Start, y + font.cap_height(LABEL_SIZE) * 0.5),
-                // A line across every lane carries its label above itself, not through it.
-                None => (plot_right - 4.0, Anchor::End, y - 5.0),
-            };
-            pins.push((tx, ty, anchor, text, colour, opacity, tag));
+
+        for (k, x) in xs.iter().enumerate() {
+            // The label goes in the pool and the mark waits, because a mark that faces anywhere
+            // should face the same way its label went.
+            if k == 0 && !text.is_empty() {
+                sided.push((labels.len(), mark, *x, y, size, colour, opacity, tag.clone()));
+                labels.push(Placement {
+                    w: font.width(&text, LABEL_SIZE),
+                    h: LABEL_SIZE * 1.15,
+                    text: text.clone(),
+                    fill: colour,
+                    opacity,
+                    tag: tag.clone(),
+                    rotate: false,
+                    side: 1.0,
+                    anchorage: Anchorage::Pin {
+                        x: *x,
+                        y: y + font.cap_height(LABEL_SIZE) * 0.5,
+                        dy: 0.0,
+                        gap: mark.reach(size),
+                    },
+                });
+            } else {
+                prims.extend(mark_prims(mark, *x, y, size, colour, opacity, 1.0, tag.clone()));
+            }
+        }
+
+        // A line across every lane carries its label above itself, not through it.
+        if xs.is_empty() && !text.is_empty() {
+            prims.push(Prim::Text {
+                x: plot_right - 4.0,
+                y: y - 5.0,
+                text,
+                size: LABEL_SIZE,
+                anchor: Anchor::End,
+                fill: colour,
+                opacity,
+                rotate: 0.0,
+                mono: false,
+                tag,
+            });
         }
     }
 
@@ -757,56 +906,26 @@ pub fn build_with(
             let Some(body) = &e.detail else { continue };
             let y = axis.y(e.time);
             for (k, line) in body.lines().enumerate() {
-                pins.push((
-                    plot_right + 16.0,
-                    y + font.cap_height(LABEL_SIZE) * 0.5 + k as f64 * LABEL_SIZE * 1.15,
-                    Anchor::Start,
-                    line.trim().to_string(),
-                    pal.faint,
-                    1.0,
-                    Tag { event: Some(i), role: "body".into(), detail: Some(body.clone()) },
-                ));
+                prims.push(Prim::Text {
+                    x: plot_right + 16.0,
+                    y: y + font.cap_height(LABEL_SIZE) * 0.5 + k as f64 * LABEL_SIZE * 1.15,
+                    text: line.trim().to_string(),
+                    size: LABEL_SIZE,
+                    anchor: Anchor::Start,
+                    fill: pal.faint,
+                    opacity: 1.0,
+                    rotate: 0.0,
+                    mono: false,
+                    tag: Tag { event: Some(i), role: "body".into(), detail: Some(body.clone()) },
+                });
             }
         }
     }
 
-    // ---- point labels, dodged downward ------------------------------------
-    //
-    // Sorted first so the result does not depend on the order events happened to be written in,
-    // then each pushed below any earlier one it would sit on. Downward rather than in both
-    // directions because a label belongs to the instant it names, and moving it up would put it
-    // above an event that had not happened yet.
-    pins.sort_by(|a, b| {
-        (a.0, a.1, &a.3).partial_cmp(&(b.0, b.1, &b.3)).unwrap_or(std::cmp::Ordering::Equal)
-    });
-    let line_h = LABEL_SIZE * 1.25;
-    for i in 0..pins.len() {
-        for j in 0..i {
-            let same_column = (pins[i].0 - pins[j].0).abs() < 1.0 && pins[i].2 == pins[j].2;
-            if same_column && (pins[i].1 - pins[j].1).abs() < line_h {
-                pins[i].1 = pins[j].1 + line_h;
-            }
-        }
-    }
-    for (x, y, anchor, text, fill, opacity, tag) in pins {
-        prims.push(Prim::Text {
-            x,
-            y,
-            text,
-            size: LABEL_SIZE,
-            anchor,
-            fill,
-            opacity,
-            rotate: 0.0,
-            mono: false,
-            tag,
-        });
-    }
-
-    // ---- message labels, once everything they must avoid exists -----------
+    // ---- every label, settled together -----------------------------------
     //
     // Last, because a label can only be placed against obstacles that already have positions: the
-    // lanes, and every point label now pinned beside its mark.
+    // lanes, the gridlines, and the text that cannot move.
     let fixed: Vec<(f64, f64, f64, f64)> = prims
         .iter()
         .filter_map(|p| match p {
@@ -822,9 +941,7 @@ pub fn build_with(
             _ => None,
         })
         .collect();
-    // The horizontal rules already drawn, so a label can be pushed off one. They run the other
-    // way from the lanes, and a slanted rail changes a label's y as well as its x, so the same one
-    // degree of freedom gets it clear of both.
+
     let rules: Vec<f64> = prims
         .iter()
         .filter_map(|p| match p {
@@ -838,21 +955,39 @@ pub fn build_with(
         .collect();
 
     if relax_labels {
-        relax(&mut rails, &lanes, &rules, &fixed);
+        // Every arrow already drawn, so a label can be pushed off one.
+        let segments: Vec<(f64, f64, f64, f64)> = prims
+            .iter()
+            .filter_map(|p| match p {
+                Prim::Line { x1, y1, x2, y2, .. }
+                    if (x2 - x1).abs() > 1.0 && (y2 - y1).abs() > 1.0 =>
+                {
+                    Some((*x1, *y1, *x2, *y2))
+                }
+                _ => None,
+            })
+            .collect();
+        relax(&mut labels, &lanes, &rules, &fixed, (4.0, plot_right), &segments);
     }
-    for r in &rails {
-        let (x, y) = r.centre();
+
+    // Marks that face somewhere, now that their labels have chosen a side.
+    for (i, mark, x, y, size, colour, opacity, tag) in sided {
+        prims.extend(mark_prims(mark, x, y, size, colour, opacity, labels[i].side, tag));
+    }
+
+    for l in &labels {
+        let (x, y, anchor) = l.text_at();
         prims.push(Prim::Text {
             x,
             y,
-            text: r.text.clone(),
+            text: l.text.clone(),
             size: LABEL_SIZE,
-            anchor: Anchor::Middle,
-            fill: r.fill,
-            opacity: r.opacity,
-            rotate: r.angle(),
+            anchor,
+            fill: l.fill,
+            opacity: l.opacity,
+            rotate: l.angle(),
             mono: false,
-            tag: r.tag.clone(),
+            tag: l.tag.clone(),
         });
     }
 
@@ -1029,6 +1164,8 @@ fn mark_prims(
     s: f64,
     colour: Color,
     opacity: f64,
+    // Which way the mark faces, for the ones that face anywhere. `+1` is from the right.
+    side: f64,
     tag: Tag,
 ) -> Vec<Prim> {
     let fill = Some(Fill { color: colour, opacity });
@@ -1081,12 +1218,31 @@ fn mark_prims(
             head: false,
             tag,
         }],
-        // An arrowhead with no shaft behind it: something arrived from outside the diagram.
+        // An arrowhead with no shaft behind it.
         Mark::Chevron => vec![Prim::Polygon {
-            points: vec![(x - s * 1.8, y - s), (x - s * 0.2, y), (x - s * 1.8, y + s)],
+            points: vec![
+                (x + side * s * 1.8, y - s),
+                (x + side * s * 0.2, y),
+                (x + side * s * 1.8, y + s),
+            ],
             fill,
             stroke: None,
             tag,
         }],
+        // A short oblique arrow into the lane, shaft and all. It comes in from the side the label
+        // settled on, so the two read as one thing rather than as a mark and a caption that
+        // happen to be near each other.
+        Mark::Arrow => {
+            let (dx, dy) = (side * s * 4.6, -s * 2.4);
+            vec![Prim::Line {
+                x1: x + dx,
+                y1: y + dy,
+                x2: x + side * s * 0.6,
+                y2: y - s * 0.3,
+                stroke: Stroke { width: 1.6, ..stroke },
+                head: true,
+                tag,
+            }]
+        }
     }
 }

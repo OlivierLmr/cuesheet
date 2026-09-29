@@ -2,6 +2,7 @@
   <title>Everything the language can say</title>
   <defs>
     <marker id="h0072b2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="#0072b2"/></marker>
+    <marker id="h009e73" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="#009e73"/></marker>
     <marker id="h14171c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="#14171c"/></marker>
   </defs>
   <rect x="0" y="0" width="684" height="362.5" fill="#ffffff"/>
@@ -43,7 +44,9 @@
   <line x1="280.4" y1="268.69" x2="290.4" y2="278.69" stroke="#cc79a7" stroke-width="1.8"/>
   <line x1="290.4" y1="268.69" x2="280.4" y2="278.69" stroke="#cc79a7" stroke-width="1.8"/>
   <line x1="78" y1="299.5" x2="588" y2="328.5" stroke="#878f9b" stroke-width="1.5"/>
-  <polygon points="70.8,78 77.2,82 70.8,86" fill="#009e73"/>
+  <line x1="44" y1="328.5" x2="622" y2="328.5" stroke="#878f9b" stroke-width="1" stroke-dasharray="4 3"/>
+  <text x="618" y="323.5" font-size="11" text-anchor="end" fill="#878f9b" font-family="Inter, ui-sans-serif, system-ui, sans-serif">time-limit</text>
+  <line x1="96.4" y1="72.4" x2="80.4" y2="80.8" stroke="#009e73" stroke-width="1.6" marker-end="url(#h009e73)"/>
   <circle cx="78" cy="82" r="4" fill="#0072b2"/>
   <circle cx="248" cy="96.5" r="4" fill="#0072b2"/>
   <circle cx="418" cy="132.75" r="4" fill="#0072b2"/>
@@ -52,20 +55,18 @@
   <line x1="414" y1="281" x2="422" y2="289" stroke="#d55e00" stroke-width="1.8"/>
   <line x1="422" y1="281" x2="414" y2="289" stroke="#d55e00" stroke-width="1.8"/>
   <circle cx="248" cy="314" r="4" fill="none" stroke="#009e73" stroke-width="1.4"/>
-  <line x1="44" y1="328.5" x2="622" y2="328.5" stroke="#878f9b" stroke-width="1" stroke-dasharray="4 3"/>
-  <text x="88" y="86" font-size="11" text-anchor="start" fill="#0072b2" font-family="Inter, ui-sans-serif, system-ui, sans-serif">deliver</text>
-  <text x="88" y="99.75" font-size="11" text-anchor="start" fill="#009e73" font-family="Inter, ui-sans-serif, system-ui, sans-serif">do_broadcast</text>
-  <text x="258" y="100.5" font-size="11" text-anchor="start" fill="#0072b2" font-family="Inter, ui-sans-serif, system-ui, sans-serif">deliver</text>
-  <text x="258" y="245.5" font-size="11" text-anchor="start" fill="#cc79a7" font-family="Inter, ui-sans-serif, system-ui, sans-serif">crash</text>
-  <text x="258" y="318" font-size="11" text-anchor="start" fill="#009e73" font-family="Inter, ui-sans-serif, system-ui, sans-serif">recover</text>
-  <text x="428" y="136.75" font-size="11" text-anchor="start" fill="#0072b2" font-family="Inter, ui-sans-serif, system-ui, sans-serif">deliver</text>
-  <text x="428" y="289" font-size="11" text-anchor="start" fill="#d55e00" font-family="Inter, ui-sans-serif, system-ui, sans-serif">exited on its own</text>
-  <text x="618" y="323.5" font-size="11" text-anchor="end" fill="#878f9b" font-family="Inter, ui-sans-serif, system-ui, sans-serif">time-limit</text>
-  <text x="167.76" y="98.8" font-size="11" text-anchor="middle" fill="#0072b2" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(4.88 167.76 98.8)">rb</text>
-  <text x="236.87" y="114.92" font-size="11" text-anchor="middle" fill="#0072b2" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(8.49 236.87 114.92)">rb</text>
-  <text x="276.96" y="123.23" font-size="11" text-anchor="middle" fill="#d55e00" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(6.04 276.96 123.23)">rb</text>
+  <text x="135.12" y="96.01" font-size="11" text-anchor="middle" fill="#0072b2" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(4.88 135.12 96.01)">rb</text>
+  <text x="273.86" y="120.44" font-size="11" text-anchor="middle" fill="#0072b2" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(8.49 273.86 120.44)">rb</text>
+  <text x="278.91" y="105.11" font-size="11" text-anchor="middle" fill="#d55e00" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(6.04 278.91 105.11)">rb</text>
   <text x="160.74" y="243.07" font-size="11" text-anchor="middle" fill="#cc79a7" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(14.35 160.74 243.07)">request, 2</text>
   <text x="68.89" y="277.75" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif">retry</text>
-  <text x="265.93" y="281.17" font-size="11" text-anchor="middle" fill="#cc79a7" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(4.88 265.93 281.17)">rb</text>
-  <text x="329.7" y="322.94" font-size="11" text-anchor="middle" fill="#878f9b" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(3.25 329.7 322.94)">rb</text>
+  <text x="267.47" y="263.02" font-size="11" text-anchor="middle" fill="#cc79a7" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(4.88 267.47 263.02)">rb</text>
+  <text x="374.32" y="307.23" font-size="11" text-anchor="middle" fill="#878f9b" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(3.25 374.32 307.23)">rb</text>
+  <text x="100" y="76.04" font-size="11" text-anchor="start" fill="#009e73" font-family="Inter, ui-sans-serif, system-ui, sans-serif">do_broadcast</text>
+  <text x="84" y="91" font-size="11" text-anchor="start" fill="#0072b2" font-family="Inter, ui-sans-serif, system-ui, sans-serif">deliver</text>
+  <text x="242" y="100.5" font-size="11" text-anchor="end" fill="#0072b2" font-family="Inter, ui-sans-serif, system-ui, sans-serif">deliver</text>
+  <text x="424" y="136.75" font-size="11" text-anchor="start" fill="#0072b2" font-family="Inter, ui-sans-serif, system-ui, sans-serif">deliver</text>
+  <text x="254" y="245.5" font-size="11" text-anchor="start" fill="#cc79a7" font-family="Inter, ui-sans-serif, system-ui, sans-serif">crash</text>
+  <text x="424" y="289" font-size="11" text-anchor="start" fill="#d55e00" font-family="Inter, ui-sans-serif, system-ui, sans-serif">exited on its own</text>
+  <text x="254" y="318" font-size="11" text-anchor="start" fill="#009e73" font-family="Inter, ui-sans-serif, system-ui, sans-serif">recover</text>
 </svg>

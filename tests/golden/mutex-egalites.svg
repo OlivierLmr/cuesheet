@@ -2,6 +2,7 @@
   <title>Lamport mutex: four processes, two rounds</title>
   <desc>converted from diagrammes/mutex-egalites.mmd — Lamport mutex, two rounds</desc>
   <defs>
+    <marker id="h009e73" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="#009e73"/></marker>
     <marker id="h14171c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="#14171c"/></marker>
   </defs>
   <rect x="0" y="0" width="684" height="4848.8" fill="#ffffff"/>
@@ -108,94 +109,94 @@
   <line x1="418" y1="4814.8" x2="588" y2="4814.8" stroke="#878f9b" stroke-width="1.5"/>
   <line x1="418" y1="4814.8" x2="78" y2="4814.8" stroke="#878f9b" stroke-width="1.5"/>
   <line x1="418" y1="4814.8" x2="248" y2="4814.8" stroke="#878f9b" stroke-width="1.5"/>
-  <polygon points="70.8,78 77.2,82 70.8,86" fill="#009e73"/>
-  <polygon points="580.8,78 587.2,82 580.8,86" fill="#009e73"/>
-  <polygon points="240.8,78 247.2,82 240.8,86" fill="#009e73"/>
-  <polygon points="410.8,78 417.2,82 410.8,86" fill="#009e73"/>
-  <polygon points="240.8,4428 247.2,4432 240.8,4436" fill="#009e73"/>
-  <polygon points="580.8,4428 587.2,4432 580.8,4436" fill="#009e73"/>
-  <polygon points="410.8,4428 417.2,4432 410.8,4436" fill="#009e73"/>
-  <polygon points="70.8,4428 77.2,4432 70.8,4436" fill="#009e73"/>
   <line x1="44" y1="4814.8" x2="622" y2="4814.8" stroke="#878f9b" stroke-width="1" stroke-dasharray="4 3"/>
-  <text x="88" y="86" font-size="11" text-anchor="start" fill="#009e73" font-family="Inter, ui-sans-serif, system-ui, sans-serif">request_cs</text>
-  <text x="88" y="4436" font-size="11" text-anchor="start" fill="#009e73" font-family="Inter, ui-sans-serif, system-ui, sans-serif">request_cs</text>
-  <text x="258" y="86" font-size="11" text-anchor="start" fill="#009e73" font-family="Inter, ui-sans-serif, system-ui, sans-serif">request_cs</text>
-  <text x="258" y="4436" font-size="11" text-anchor="start" fill="#009e73" font-family="Inter, ui-sans-serif, system-ui, sans-serif">request_cs</text>
-  <text x="428" y="86" font-size="11" text-anchor="start" fill="#009e73" font-family="Inter, ui-sans-serif, system-ui, sans-serif">request_cs</text>
-  <text x="428" y="4436" font-size="11" text-anchor="start" fill="#009e73" font-family="Inter, ui-sans-serif, system-ui, sans-serif">request_cs</text>
-  <text x="598" y="86" font-size="11" text-anchor="start" fill="#009e73" font-family="Inter, ui-sans-serif, system-ui, sans-serif">request_cs</text>
-  <text x="598" y="4436" font-size="11" text-anchor="start" fill="#009e73" font-family="Inter, ui-sans-serif, system-ui, sans-serif">request_cs</text>
   <text x="618" y="4809.8" font-size="11" text-anchor="end" fill="#878f9b" font-family="Inter, ui-sans-serif, system-ui, sans-serif">quiescent</text>
-  <text x="387.51" y="75.46" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-4.88 387.51 75.46)">mx_request</text>
-  <text x="151.82" y="97.44" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(4.88 151.82 97.44)">mx_request</text>
-  <text x="222.74" y="82.04" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-2.69 222.74 82.04)">mx_request</text>
-  <text x="300.65" y="98.08" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(1.79 300.65 98.08)">mx_request</text>
-  <text x="338.81" y="81.39" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-1.95 338.81 81.39)">mx_request</text>
-  <text x="168.99" y="80.93" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-5.84 168.99 80.93)">mx_request</text>
-  <text x="553.19" y="104.99" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(5.84 553.19 104.99)">mx_request</text>
-  <text x="521.35" y="80.79" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-6.81 521.35 80.79)">mx_request</text>
-  <text x="397.7" y="100.06" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(3.42 397.7 100.06)">mx_request</text>
-  <text x="275.84" y="94.74" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(7.29 275.84 94.74)">mx_request</text>
-  <text x="208.74" y="99.49" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(3.66 208.74 99.49)">mx_request</text>
-  <text x="395.49" y="87.64" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-4.39 395.49 87.64)">mx_request</text>
-  <text x="277.77" y="108.18" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(4.88 277.77 108.18)">mx_reply</text>
-  <text x="101.28" y="103.6" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-6.33 101.28 103.6)">mx_reply</text>
-  <text x="180.85" y="112.77" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(3.17 180.85 112.77)">mx_reply</text>
-  <text x="354.75" y="99.44" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-2.6 354.75 99.44)">mx_reply</text>
-  <text x="339.31" y="115.94" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(1.63 339.31 115.94)">mx_reply</text>
-  <text x="498.91" y="103.11" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-8.25 498.91 103.11)">mx_reply</text>
-  <text x="131.88" y="117.36" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(9.21 131.88 117.36)">mx_reply</text>
-  <text x="500.97" y="119.23" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(5.36 500.97 119.23)">mx_reply</text>
-  <text x="452.79" y="100.67" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-3.17 452.79 100.67)">mx_reply</text>
-  <text x="331.31" y="102" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-4.88 331.31 102)">mx_reply</text>
-  <text x="228.05" y="104.35" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-2.93 228.05 104.35)">mx_reply</text>
-  <text x="389.84" y="123.27" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(2.44 389.84 123.27)">mx_reply</text>
-  <text x="332.74" y="210" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(1.63 332.74 210)">mx_release</text>
-  <text x="214.29" y="209.74" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(2.93 214.29 209.74)">mx_release</text>
-  <text x="152.1" y="212.31" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(7.29 152.1 212.31)">mx_release</text>
-  <text x="322.12" y="303.36" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(4.88 322.12 303.36)">mx_release</text>
+  <line x1="96.4" y1="72.4" x2="80.4" y2="80.8" stroke="#009e73" stroke-width="1.6" marker-end="url(#h009e73)"/>
+  <line x1="569.6" y1="72.4" x2="585.6" y2="80.8" stroke="#009e73" stroke-width="1.6" marker-end="url(#h009e73)"/>
+  <line x1="229.6" y1="72.4" x2="245.6" y2="80.8" stroke="#009e73" stroke-width="1.6" marker-end="url(#h009e73)"/>
+  <line x1="436.4" y1="72.4" x2="420.4" y2="80.8" stroke="#009e73" stroke-width="1.6" marker-end="url(#h009e73)"/>
+  <line x1="229.6" y1="4422.4" x2="245.6" y2="4430.8" stroke="#009e73" stroke-width="1.6" marker-end="url(#h009e73)"/>
+  <line x1="569.6" y1="4422.4" x2="585.6" y2="4430.8" stroke="#009e73" stroke-width="1.6" marker-end="url(#h009e73)"/>
+  <line x1="399.6" y1="4422.4" x2="415.6" y2="4430.8" stroke="#009e73" stroke-width="1.6" marker-end="url(#h009e73)"/>
+  <line x1="96.4" y1="4422.4" x2="80.4" y2="4430.8" stroke="#009e73" stroke-width="1.6" marker-end="url(#h009e73)"/>
+  <text x="333.87" y="98.32" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-4.88 333.87 98.32)">mx_request</text>
+  <text x="123.46" y="76.74" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(4.88 123.46 76.74)">mx_request</text>
+  <text x="193.76" y="83.4" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-2.69 193.76 83.4)">mx_request</text>
+  <text x="292.78" y="79.6" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(1.79 292.78 79.6)">mx_request</text>
+  <text x="373.2" y="80.22" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-1.95 373.2 80.22)">mx_request</text>
+  <text x="99.33" y="106.37" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-5.84 99.33 106.37)">mx_request</text>
+  <text x="450.11" y="76.13" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(5.84 450.11 76.13)">mx_request</text>
+  <text x="555.74" y="76.68" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-6.81 555.74 76.68)">mx_request</text>
+  <text x="498.47" y="106.08" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(3.42 498.47 106.08)">mx_request</text>
+  <text x="280.34" y="76.96" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(7.29 280.34 76.96)">mx_request</text>
+  <text x="193.6" y="98.52" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(3.66 193.6 98.52)">mx_request</text>
+  <text x="471.51" y="81.81" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-4.39 471.51 81.81)">mx_request</text>
+  <text x="333.87" y="94.68" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(4.88 333.87 94.68)">mx_reply</text>
+  <text x="110.48" y="120.91" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-6.33 110.48 120.91)">mx_reply</text>
+  <text x="274.7" y="117.98" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(3.17 274.7 117.98)">mx_reply</text>
+  <text x="333.41" y="118.65" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-2.6 333.41 118.65)">mx_reply</text>
+  <text x="333.26" y="97.55" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(1.63 333.26 97.55)">mx_reply</text>
+  <text x="504.21" y="120.75" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-8.25 504.21 120.75)">mx_reply</text>
+  <text x="175.34" y="124.4" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(9.21 175.34 124.4)">mx_reply</text>
+  <text x="476.75" y="98.66" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(5.36 476.75 98.66)">mx_reply</text>
+  <text x="391.3" y="122.33" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-3.17 391.3 122.33)">mx_reply</text>
+  <text x="333.77" y="120.08" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-4.88 333.77 120.08)">mx_reply</text>
+  <text x="274.73" y="101.96" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-2.93 274.73 101.96)">mx_reply</text>
+  <text x="444.81" y="125.61" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(2.44 444.81 125.61)">mx_reply</text>
+  <text x="333.26" y="191.8" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(1.63 333.26 191.8)">mx_release</text>
+  <text x="194.26" y="190.48" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(2.93 194.26 190.48)">mx_release</text>
+  <text x="161.84" y="213.56" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(7.29 161.84 213.56)">mx_release</text>
+  <text x="333.77" y="286.07" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(4.88 333.77 286.07)">mx_release</text>
   <text x="162" y="288.27" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-6.33 162 288.27)">mx_release</text>
-  <text x="384.31" y="308.08" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(4.63 384.31 308.08)">mx_release</text>
-  <text x="213.71" y="374.5" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-2.44 213.71 374.5)">mx_release</text>
-  <text x="502.15" y="391.94" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(5.36 502.15 391.94)">mx_release</text>
-  <text x="332.07" y="374.54" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-5.84 332.07 374.54)">mx_release</text>
-  <text x="383.96" y="462.94" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-2.44 383.96 462.94)">mx_release</text>
-  <text x="502.23" y="461.52" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-4.88 502.23 461.52)">mx_release</text>
-  <text x="321.47" y="462.57" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-1.79 321.47 462.57)">mx_release</text>
-  <text x="224.85" y="4431.12" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-2.44 224.85 4431.12)">mx_request</text>
-  <text x="392.56" y="4432.05" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-2.69 392.56 4432.05)">mx_request</text>
-  <text x="177.29" y="4445.78" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(2.69 177.29 4445.78)">mx_request</text>
-  <text x="110.83" y="4444.52" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(5.84 110.83 4444.52)">mx_request</text>
-  <text x="282" y="4444.93" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(6.33 282 4444.93)">mx_request</text>
-  <text x="504.71" y="4451.53" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(6.81 504.71 4451.53)">mx_request</text>
-  <text x="331.04" y="4433.21" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-6.81 331.04 4433.21)">mx_request</text>
-  <text x="332.18" y="4451.96" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(2.44 332.18 4451.96)">mx_request</text>
-  <text x="515.78" y="4433.27" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-8.25 515.78 4433.27)">mx_request</text>
-  <text x="170.38" y="4434.7" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-8.73 170.38 4434.7)">mx_request</text>
-  <text x="392.09" y="4452.81" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(4.63 392.09 4452.81)">mx_request</text>
-  <text x="382.51" y="4433.98" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-3.09 382.51 4433.98)">mx_request</text>
-  <text x="218.56" y="4465.22" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(3.9 218.56 4465.22)">mx_reply</text>
-  <text x="374.18" y="4463.53" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(2.93 374.18 4463.53)">mx_reply</text>
-  <text x="218.3" y="4450.75" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-3.42 218.3 4450.75)">mx_reply</text>
-  <text x="113.2" y="4457.46" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-7.29 113.2 4457.46)">mx_reply</text>
-  <text x="351.68" y="4447.92" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-5.36 351.68 4447.92)">mx_reply</text>
-  <text x="319.27" y="4469.98" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(6.81 319.27 4469.98)">mx_reply</text>
-  <text x="559.73" y="4446.73" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-7.29 559.73 4446.73)">mx_reply</text>
-  <text x="270.66" y="4453.66" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-1.63 270.66 4453.66)">mx_reply</text>
-  <text x="502" y="4475.13" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(6.33 502 4475.13)">mx_reply</text>
+  <text x="472.94" y="296.99" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(4.63 472.94 296.99)">mx_release</text>
+  <text x="193.41" y="375.36" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-2.44 193.41 375.36)">mx_release</text>
+  <text x="503.85" y="373.81" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(5.36 503.85 373.81)">mx_release</text>
+  <text x="333.93" y="392.66" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-5.84 333.93 392.66)">mx_release</text>
+  <text x="363.41" y="463.81" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-2.44 363.41 463.81)">mx_release</text>
+  <text x="503.77" y="479.68" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-4.88 503.77 479.68)">mx_release</text>
+  <text x="333.28" y="480.43" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-1.79 333.28 480.43)">mx_release</text>
+  <text x="194.77" y="4450.64" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-2.44 194.77 4450.64)">mx_request</text>
+  <text x="471.58" y="4428.34" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-2.69 471.58 4428.34)">mx_request</text>
+  <text x="194.22" y="4428.33" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(2.69 194.22 4428.33)">mx_request</text>
+  <text x="123.71" y="4427.52" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(5.84 123.71 4427.52)">mx_request</text>
+  <text x="293.5" y="4427.88" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(6.33 293.5 4427.88)">mx_request</text>
+  <text x="501.92" y="4451.19" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(6.81 501.92 4451.19)">mx_request</text>
+  <text x="347.68" y="4449.57" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-6.81 347.68 4449.57)">mx_request</text>
+  <text x="292.59" y="4432.04" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(2.44 292.59 4432.04)">mx_request</text>
+  <text x="555.51" y="4427.51" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-8.25 555.51 4427.51)">mx_request</text>
+  <text x="121.4" y="4442.22" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-8.73 121.4 4442.22)">mx_request</text>
+  <text x="364.53" y="4432.3" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(4.63 364.53 4432.3)">mx_request</text>
+  <text x="373.02" y="4434.49" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-3.09 373.02 4434.49)">mx_request</text>
+  <text x="274.58" y="4469.04" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(3.9 274.58 4469.04)">mx_reply</text>
+  <text x="444.73" y="4467.14" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(2.93 444.73 4467.14)">mx_reply</text>
+  <text x="221.34" y="4468.82" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-3.42 221.34 4468.82)">mx_reply</text>
+  <text x="137.05" y="4472.78" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-7.29 137.05 4472.78)">mx_reply</text>
+  <text x="333.85" y="4467.89" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-5.36 333.85 4467.89)">mx_reply</text>
+  <text x="347.68" y="4455.03" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(6.81 347.68 4455.03)">mx_reply</text>
+  <text x="504.16" y="4472.21" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-7.29 504.16 4472.21)">mx_reply</text>
+  <text x="291.94" y="4453.06" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-1.63 291.94 4453.06)">mx_reply</text>
+  <text x="504" y="4457.02" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(6.33 504 4457.02)">mx_reply</text>
   <text x="161.69" y="4479.44" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(8.25 161.69 4479.44)">mx_reply</text>
-  <text x="446.76" y="4456.46" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-2.44 446.76 4456.46)">mx_reply</text>
-  <text x="369.46" y="4479.44" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(2.12 369.46 4479.44)">mx_reply</text>
-  <text x="321.46" y="4535.06" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-2.6 321.46 4535.06)">mx_release</text>
-  <text x="501.69" y="4535.36" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-8.25 501.69 4535.36)">mx_release</text>
-  <text x="383.94" y="4538.58" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-4.39 383.94 4538.58)">mx_release</text>
-  <text x="332.66" y="4646.28" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(2.12 332.66 4646.28)">mx_release</text>
-  <text x="152.09" y="4646.41" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(7.29 152.09 4646.41)">mx_release</text>
-  <text x="214.29" y="4647.35" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(4.39 214.29 4647.35)">mx_release</text>
-  <text x="384.3" y="4738.68" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(3.17 384.3 4738.68)">mx_release</text>
-  <text x="322.1" y="4740.02" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(6.81 322.1 4740.02)">mx_release</text>
+  <text x="391.19" y="4477.06" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-2.44 391.19 4477.06)">mx_reply</text>
+  <text x="332.66" y="4478.08" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(2.12 332.66 4478.08)">mx_reply</text>
+  <text x="332.59" y="4534.55" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-2.6 332.59 4534.55)">mx_release</text>
+  <text x="504.31" y="4553.39" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-8.25 504.31 4553.39)">mx_release</text>
+  <text x="498.32" y="4529.8" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-4.39 498.32 4529.8)">mx_release</text>
+  <text x="333.34" y="4628.07" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(2.12 333.34 4628.07)">mx_release</text>
+  <text x="161.84" y="4647.66" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(7.29 161.84 4647.66)">mx_release</text>
+  <text x="141.06" y="4623.46" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(4.39 141.06 4623.46)">mx_release</text>
+  <text x="472.71" y="4725.34" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(3.17 472.71 4725.34)">mx_release</text>
+  <text x="331.92" y="4741.19" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(6.81 331.92 4741.19)">mx_release</text>
   <text x="161.92" y="4723.11" font-size="11" text-anchor="middle" fill="#14171c" font-family="Inter, ui-sans-serif, system-ui, sans-serif" transform="rotate(-6.81 161.92 4723.11)">mx_release</text>
-  <text x="503" y="4823.91" font-size="11" text-anchor="middle" fill="#878f9b" font-family="Inter, ui-sans-serif, system-ui, sans-serif">mx_release</text>
-  <text x="281.64" y="4805.69" font-size="11" text-anchor="middle" fill="#878f9b" font-family="Inter, ui-sans-serif, system-ui, sans-serif">mx_release</text>
-  <text x="343.79" y="4805.69" font-size="11" text-anchor="middle" fill="#878f9b" font-family="Inter, ui-sans-serif, system-ui, sans-serif">mx_release</text>
+  <text x="503" y="4805.69" font-size="11" text-anchor="middle" fill="#878f9b" font-family="Inter, ui-sans-serif, system-ui, sans-serif">mx_release</text>
+  <text x="193.79" y="4805.69" font-size="11" text-anchor="middle" fill="#878f9b" font-family="Inter, ui-sans-serif, system-ui, sans-serif">mx_release</text>
+  <text x="333" y="4805.69" font-size="11" text-anchor="middle" fill="#878f9b" font-family="Inter, ui-sans-serif, system-ui, sans-serif">mx_release</text>
+  <text x="100" y="91" font-size="11" text-anchor="start" fill="#009e73" font-family="Inter, ui-sans-serif, system-ui, sans-serif">request_cs</text>
+  <text x="566" y="91" font-size="11" text-anchor="end" fill="#009e73" font-family="Inter, ui-sans-serif, system-ui, sans-serif">request_cs</text>
+  <text x="226" y="71" font-size="11" text-anchor="end" fill="#009e73" font-family="Inter, ui-sans-serif, system-ui, sans-serif">request_cs</text>
+  <text x="440" y="91" font-size="11" text-anchor="start" fill="#009e73" font-family="Inter, ui-sans-serif, system-ui, sans-serif">request_cs</text>
+  <text x="226" y="4421" font-size="11" text-anchor="end" fill="#009e73" font-family="Inter, ui-sans-serif, system-ui, sans-serif">request_cs</text>
+  <text x="566" y="4441" font-size="11" text-anchor="end" fill="#009e73" font-family="Inter, ui-sans-serif, system-ui, sans-serif">request_cs</text>
+  <text x="396" y="4421" font-size="11" text-anchor="end" fill="#009e73" font-family="Inter, ui-sans-serif, system-ui, sans-serif">request_cs</text>
+  <text x="100" y="4421" font-size="11" text-anchor="start" fill="#009e73" font-family="Inter, ui-sans-serif, system-ui, sans-serif">request_cs</text>
 </svg>

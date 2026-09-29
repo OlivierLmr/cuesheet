@@ -220,6 +220,10 @@ pub enum Mark {
     Cross,
     Bar,
     Chevron,
+    /// A short oblique arrow into the lane, shaft and all. For something arriving from outside the
+    /// diagram — a request from whoever is using the module — where a bare arrowhead says too
+    /// little about where it came from.
+    Arrow,
     None,
 }
 
@@ -233,13 +237,24 @@ impl Mark {
             "cross" => Mark::Cross,
             "bar" => Mark::Bar,
             "chevron" => Mark::Chevron,
+            "arrow" => Mark::Arrow,
             "none" => Mark::None,
             _ => return None,
         })
     }
 
-    pub const ALL: [&'static str; 8] =
-        ["dot", "ring", "square", "diamond", "cross", "bar", "chevron", "none"];
+    pub const ALL: [&'static str; 9] =
+        ["dot", "ring", "square", "diamond", "cross", "bar", "chevron", "arrow", "none"];
+
+    /// How much room the mark needs beside the lane, before a label starts. An arrow has a shaft
+    /// to clear; everything else is about as wide as it is tall.
+    pub fn reach(&self, size: f64) -> f64 {
+        match self {
+            Mark::Arrow => size * 5.5,
+            Mark::None => 2.0,
+            _ => size + 2.0,
+        }
+    }
 }
 
 /// How a span's far end is drawn. `Ragged` is how an unclosed span says it never closed, which is
