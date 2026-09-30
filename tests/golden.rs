@@ -9,10 +9,10 @@
 use cuesheet::{derive, font, layout, parse, svg};
 use std::path::Path;
 
-const STYLE: &str = include_str!("../examples/course.sts");
+const STYLE: &str = include_str!("../examples/course.cuestyle");
 
 fn render(name: &str) -> String {
-    let src = std::fs::read_to_string(format!("examples/{name}.st")).expect("example exists");
+    let src = std::fs::read_to_string(format!("examples/{name}.cuesheet")).expect("example exists");
     let doc = parse::document(&src).expect("example parses");
     let sheet = cuesheet::stylesheet(Some(STYLE)).expect("style parses");
     let run = derive::run(&doc, &sheet);
@@ -87,13 +87,13 @@ fn every_example_has_a_golden_file() {
     }
     for entry in std::fs::read_dir("examples").expect("examples/ exists") {
         let p = entry.expect("readable").path();
-        if p.extension().and_then(|e| e.to_str()) != Some("st") {
+        if p.extension().and_then(|e| e.to_str()) != Some("cuesheet") {
             continue;
         }
         let stem = p.file_stem().and_then(|s| s.to_str()).expect("named");
         assert!(
             Path::new(&format!("tests/golden/{stem}.svg")).exists(),
-            "examples/{stem}.st has no golden file; run with UPDATE_GOLDEN=1"
+            "examples/{stem}.cuesheet has no golden file; run with UPDATE_GOLDEN=1"
         );
     }
 }

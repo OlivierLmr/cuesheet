@@ -28,7 +28,7 @@ pub mod png;
 /// Loaded first, always, with any sheet of the caller's laid over it. That is what lets a document
 /// render at all when nobody has styled it — an undeclared kind comes out as a dot carrying its own
 /// name — and what makes overriding one row a one-line change rather than a rewrite.
-pub const DEFAULT_STYLE: &str = include_str!("../assets/default.sts");
+pub const DEFAULT_STYLE: &str = include_str!("../assets/default.cuestyle");
 
 /// Parse the default sheet, then the caller's on top.
 pub fn stylesheet(extra: Option<&str>) -> Result<model::StyleSheet, parse::Error> {

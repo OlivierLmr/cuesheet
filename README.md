@@ -9,13 +9,13 @@ trigger. This is the same thing for a distributed run, and it pairs with
 [cuelight](https://github.com/OlivierLmr/cuelight), the simulator that produces the runs.
 
 ```sh
-cuesheet render run.st --style course.sts --out run.svg
-cuelight viz --journal store/latest/journal.jsonl --format cuesheet   # writes messages.st
+cuesheet render run.cuesheet --style course.cuestyle --out run.svg
+cuelight viz --journal store/latest/journal.jsonl --format cuesheet   # writes messages.cuesheet
 ```
 
 ## Two files
 
-A **document** (`.st`) states facts — who took part, and what happened when:
+A **document** (`.cuesheet`) states facts — who took part, and what happened when:
 
 ```
 title "A relay that never happened"
@@ -28,7 +28,7 @@ participants n0 n1 n2 n3
 377  run end quiescent
 ```
 
-A **style sheet** (`.sts`) says what the names in that document *are*, and how they look:
+A **style sheet** (`.cuestyle`) says what the names in that document *are*, and how they look:
 
 ```
 kind  point crash kills

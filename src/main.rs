@@ -11,15 +11,14 @@ use std::process::ExitCode;
 const USAGE: &str = "\
 cuesheet — draws a distributed run as a space-time diagram
 
-  cuesheet render <doc.st> [options]
+  cuesheet render <doc.cuesheet> [options]
 
-  --style <file.sts>   styles, laid over the built-in defaults
-  --out <file>         where to write; stdout if absent
-  --format svg|png|html
-                       defaults to the extension of --out; else html when
-                       opening, svg when writing to stdout
-  --open               show the result, writing beside the document if
-                       --out is absent
+  --style <file.cuestyle>  styles, laid over the built-in defaults
+  --out <file>             where to write; stdout if absent
+  --format svg|png|html    defaults to the extension of --out; else html
+                           when opening, svg when writing to stdout
+  --open                   show the result, writing beside the document
+                           if --out is absent
   --version
 ";
 
@@ -193,15 +192,15 @@ mod tests {
 
     #[test]
     fn open_writes_beside_the_document_when_nowhere_else_is_said() {
-        assert_eq!(beside(std::path::Path::new("store/run/messages.st"), "html"),
+        assert_eq!(beside(std::path::Path::new("store/run/messages.cuesheet"), "html"),
                    PathBuf::from("store/run/messages.html"));
-        assert_eq!(beside(std::path::Path::new("a/b.st"), "svg"), PathBuf::from("a/b.svg"));
+        assert_eq!(beside(std::path::Path::new("a/b.cuesheet"), "svg"), PathBuf::from("a/b.svg"));
     }
 
     /// `--format htm` is accepted, but a file called `.htm` is nobody's intent.
     #[test]
     fn the_short_spelling_of_html_still_writes_a_html_file() {
-        assert_eq!(beside(std::path::Path::new("x.st"), "htm"), PathBuf::from("x.html"));
+        assert_eq!(beside(std::path::Path::new("x.cuesheet"), "htm"), PathBuf::from("x.html"));
     }
 
     #[test]

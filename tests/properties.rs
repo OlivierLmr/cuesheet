@@ -8,13 +8,13 @@ use cuesheet::picture::{Anchor, Picture, Prim};
 use cuesheet::{derive, font, layout, parse, svg};
 
 const RUNS: [&str; 4] = [
-    include_str!("../examples/relais-manquant.st"),
-    include_str!("../examples/showcase.st"),
-    include_str!("../examples/partition.st"),
-    include_str!("../examples/mutex-egalites.st"),
+    include_str!("../examples/relais-manquant.cuesheet"),
+    include_str!("../examples/showcase.cuesheet"),
+    include_str!("../examples/partition.cuesheet"),
+    include_str!("../examples/mutex-egalites.cuesheet"),
 ];
 const NAMES: [&str; 4] = ["relais-manquant", "showcase", "partition", "mutex-egalites"];
-const STYLE: &str = include_str!("../examples/course.sts");
+const STYLE: &str = include_str!("../examples/course.cuestyle");
 
 fn picture(src: &str, style: Option<&str>, relax: bool) -> Picture {
     let doc = parse::document(src).expect("example should parse");

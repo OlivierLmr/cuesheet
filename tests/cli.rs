@@ -30,7 +30,7 @@ fn err(o: &Output) -> String {
 
 #[test]
 fn rendering_a_document_writes_an_svg_to_stdout() {
-    let o = run(&["render", "examples/relais-manquant.st"]);
+    let o = run(&["render", "examples/relais-manquant.cuesheet"]);
     assert!(o.status.success(), "{}", err(&o));
     assert!(out(&o).starts_with("<svg"), "{}", &out(&o)[..80.min(out(&o).len())]);
 }
@@ -40,7 +40,7 @@ fn the_format_follows_the_output_extension_when_it_is_not_given() {
     let dir = std::env::temp_dir().join("cuesheet-cli-ext");
     std::fs::create_dir_all(&dir).unwrap();
     let path = dir.join("out.html");
-    let o = run(&["render", "examples/relais-manquant.st", "--out", path.to_str().unwrap()]);
+    let o = run(&["render", "examples/relais-manquant.cuesheet", "--out", path.to_str().unwrap()]);
     assert!(o.status.success(), "{}", err(&o));
     let body = std::fs::read_to_string(&path).unwrap();
     assert!(body.starts_with("<!doctype html>"), "{}", &body[..60]);
@@ -50,9 +50,9 @@ fn the_format_follows_the_output_extension_when_it_is_not_given() {
 fn a_style_sheet_is_laid_over_the_defaults() {
     let dir = std::env::temp_dir().join("cuesheet-cli-style");
     std::fs::create_dir_all(&dir).unwrap();
-    let sts = dir.join("s.sts");
-    std::fs::write(&sts, "style arrow color=#123456").unwrap();
-    let o = run(&["render", "examples/relais-manquant.st", "--style", sts.to_str().unwrap()]);
+    let sheet = dir.join("s.cuestyle");
+    std::fs::write(&sheet, "style arrow color=#123456").unwrap();
+    let o = run(&["render", "examples/relais-manquant.cuesheet", "--style", sheet.to_str().unwrap()]);
     assert!(o.status.success(), "{}", err(&o));
     assert!(out(&o).contains("#123456"), "the override did not take");
     // And the defaults are still underneath: lifelines were never mentioned by that sheet.
@@ -63,18 +63,18 @@ fn a_style_sheet_is_laid_over_the_defaults() {
 fn a_parse_error_names_the_file_the_line_and_the_column() {
     let dir = std::env::temp_dir().join("cuesheet-cli-bad");
     std::fs::create_dir_all(&dir).unwrap();
-    let bad = dir.join("bad.st");
+    let bad = dir.join("bad.cuesheet");
     std::fs::write(&bad, "0 n0 deliver\nnope n1 deliver\n").unwrap();
     let o = run(&["render", bad.to_str().unwrap()]);
     assert!(!o.status.success());
     let e = err(&o);
-    assert!(e.contains("bad.st:2:1"), "{e}");
+    assert!(e.contains("bad.cuesheet:2:1"), "{e}");
     assert!(e.contains("not a time"), "{e}");
 }
 
 #[test]
 fn an_unknown_flag_names_the_three_that_exist() {
-    let o = run(&["render", "examples/relais-manquant.st", "--only", ".rb"]);
+    let o = run(&["render", "examples/relais-manquant.cuesheet", "--only", ".rb"]);
     assert!(!o.status.success());
     let e = err(&o);
     assert!(e.contains("--style") && e.contains("--out") && e.contains("--format"), "{e}");
@@ -82,23 +82,23 @@ fn an_unknown_flag_names_the_three_that_exist() {
 
 #[test]
 fn an_unknown_format_names_the_three_that_exist() {
-    let o = run(&["render", "examples/relais-manquant.st", "--format", "pdf"]);
+    let o = run(&["render", "examples/relais-manquant.cuesheet", "--format", "pdf"]);
     assert!(!o.status.success());
     assert!(err(&o).contains("svg, png, html"), "{}", err(&o));
 }
 
 #[test]
 fn an_unknown_command_says_there_is_one() {
-    let o = run(&["draw", "x.st"]);
+    let o = run(&["draw", "x.cuesheet"]);
     assert!(!o.status.success());
     assert!(err(&o).contains("there is one, `render`"), "{}", err(&o));
 }
 
 #[test]
 fn a_missing_file_says_so_rather_than_panicking() {
-    let o = run(&["render", "nowhere/at/all.st"]);
+    let o = run(&["render", "nowhere/at/all.cuesheet"]);
     assert!(!o.status.success());
-    assert!(err(&o).contains("all.st"), "{}", err(&o));
+    assert!(err(&o).contains("all.cuesheet"), "{}", err(&o));
 }
 
 #[test]
@@ -113,7 +113,7 @@ fn help_and_version_work_without_a_document() {
 #[cfg(not(feature = "png"))]
 #[test]
 fn a_build_without_png_says_so() {
-    let o = run(&["render", "examples/relais-manquant.st", "--format", "png"]);
+    let o = run(&["render", "examples/relais-manquant.cuesheet", "--format", "png"]);
     assert!(!o.status.success());
     assert!(err(&o).contains("--features png"), "{}", err(&o));
 }
@@ -125,7 +125,7 @@ fn png_renders_and_is_reproducible() {
     std::fs::create_dir_all(&dir).unwrap();
     let (a, b) = (dir.join("a.png"), dir.join("b.png"));
     for p in [&a, &b] {
-        let o = run(&["render", "examples/relais-manquant.st", "--out", p.to_str().unwrap()]);
+        let o = run(&["render", "examples/relais-manquant.cuesheet", "--out", p.to_str().unwrap()]);
         assert!(o.status.success(), "{}", err(&o));
     }
     let (x, y) = (std::fs::read(&a).unwrap(), std::fs::read(&b).unwrap());
@@ -147,7 +147,7 @@ fn the_usage_names_every_flag_including_open() {
 /// The closed set in the error message has to keep pace with the set itself, or it teaches a lie.
 #[test]
 fn an_unknown_flag_names_all_four() {
-    let o = run(&["render", "examples/partition.st", "--zoom"]);
+    let o = run(&["render", "examples/partition.cuesheet", "--zoom"]);
     assert!(!o.status.success());
     let e = err(&o);
     assert!(e.contains("four"), "{e}");
