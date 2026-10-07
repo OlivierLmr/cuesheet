@@ -3,6 +3,9 @@ name = "cuesheet"
 version = "0.1.0"
 edition = "2021"
 description = "Draws a distributed run as a space-time diagram: arrows slant from the instant a message left to the instant it landed"
+license = "MIT"
+repository = "https://github.com/OlivierLmr/cuesheet"
+readme = "README.md"
 
 [dependencies]
 # Text width has to be computed from bytes the binary owns, or the output stops
