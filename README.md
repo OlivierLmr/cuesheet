@@ -4,6 +4,9 @@ Draws a distributed run as a **space-time diagram**: a message is a segment from
 left to the instant it landed, so its slope is its flight time. A Mermaid sequence diagram draws
 that same message as a horizontal arrow, which is a lie about every run that has a network in it.
 
+> **On authorship.** I designed and own this project; the code was written by Claude under my
+> direction. Full breakdown: [Human / AI split](#human--ai-split).
+
 A *cue sheet* is the stage manager's document — every cue in order, with its timing and its
 trigger. This is the same thing for a distributed run, and it pairs with
 [cuelight](https://github.com/OlivierLmr/cuelight), the simulator that produces the runs.
@@ -89,6 +92,27 @@ PNG needs `--features png`.
 
 ## Not in v1
 
-Filtering (`--only`, `--between`), folding lanes together, and diffing two runs. Without filtering
-this is comfortable at four nodes and gets crowded beyond; the compressed and ordinal axes help
-with dense *time*, and nothing here helps with dense *lanes*.
+Filtering (`--only`, `--between`), folding lanes together, and diffing two runs. The compressed and
+ordinal axes help with dense *time*; nothing here helps with dense *lanes*, and ten lanes is an
+ordinary run rather than an extreme one. `axis=ordinal` is what keeps those legible meanwhile.
+
+## Human / AI split
+
+| Area | Olivier | Claude |
+|---|---|---|
+| Concept and scope | The need, and the shape: a tool of its own rather than more of cuelight. Two constraints I held it to throughout: that it work with cuelight, and that it serve my SDR course | Asked to survey what already existed, to think it through with me, and to argue against what I proposed |
+| The language | The constraints, the vision, and many of the details | Asked to fill the gaps, so that what the constraints left open became a complete design |
+| Implementation (`src/`) | Not involved, beyond the decisions it implements | Wrote it |
+| Tests | The standard: each feature tested as it was built, and the suite checked for gaps rather than assumed complete | Wrote them |
+| Documentation | The corrections, and the cuts | Wrote it |
+| Verification | I looked at the diagrams it drew and said what was wrong with them, and read parts of the code | Ran the suite before each commit, and checked the load-bearing tests by breaking the code they guard |
+
+**What the verbs mean here.** A commit needed two things. The suite had to pass, all 180 of it, and
+the tests guarding the subtle behaviour were checked by breaking the code they cover rather than
+merely watched to go green. Not every one of the 180 was put through that. And I had
+to be satisfied with the picture: most of my corrections came from looking at real runs from my own
+course and saying what read badly, which is how the label placement, the oblique arrow mark and the
+axis default each got changed. I read parts of the Rust. I did not read every line of it.
+
+**On the commit log.** Many commits carry `Co-Authored-By: Claude`. That records which tool wrote
+the code. The design, the decisions and the responsibility for what shipped are mine.
