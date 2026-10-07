@@ -9,7 +9,7 @@
 use cuesheet::{derive, font, layout, parse, svg};
 use std::path::Path;
 
-const STYLE: &str = include_str!("../examples/course.cuestyle");
+const STYLE: &str = include_str!("../examples/cuesheet.cuestyle");
 
 fn render(name: &str) -> String {
     let src = std::fs::read_to_string(format!("examples/{name}.cuesheet")).expect("example exists");

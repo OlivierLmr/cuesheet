@@ -153,3 +153,70 @@ fn an_unknown_flag_names_all_four() {
     assert!(e.contains("four"), "{e}");
     assert!(e.contains("--open"), "{e}");
 }
+
+/// A sheet beside the document is found without being named — the whole reason the rule is
+/// bearable, since otherwise every render carries a second path.
+#[test]
+fn a_sheet_beside_the_document_is_used_without_being_named() {
+    let dir = std::env::temp_dir().join("cuesheet-cli-sibling");
+    let _ = std::fs::remove_dir_all(&dir);
+    std::fs::create_dir_all(&dir).unwrap();
+    let doc = dir.join("run.cuesheet");
+    std::fs::copy("examples/partition.cuesheet", &doc).unwrap();
+    std::fs::write(dir.join("cuesheet.cuestyle"), "style arrow color=#abcdef").unwrap();
+
+    let o = run(&["render", doc.to_str().unwrap()]);
+    assert!(o.status.success(), "{}", err(&o));
+    assert!(out(&o).contains("#abcdef"), "the sibling sheet was not applied");
+}
+
+/// With no sheet at all, say so. Rendering anyway produces a page that looks like the tool is poor
+/// rather than like a flag is missing, which is the failure this rule exists to prevent.
+#[test]
+fn no_sheet_and_no_flag_names_both_ways_out() {
+    let dir = std::env::temp_dir().join("cuesheet-cli-nosheet");
+    let _ = std::fs::remove_dir_all(&dir);
+    std::fs::create_dir_all(&dir).unwrap();
+    let doc = dir.join("run.cuesheet");
+    std::fs::copy("examples/partition.cuesheet", &doc).unwrap();
+
+    let o = run(&["render", doc.to_str().unwrap()]);
+    assert!(!o.status.success(), "rendering with no sheet should fail");
+    let e = err(&o);
+    assert!(e.contains("--style"), "{e}");
+    assert!(e.contains("cuesheet.cuestyle"), "{e}");
+    assert!(e.contains(dir.to_str().unwrap()), "it should say where it looked: {e}");
+}
+
+/// Named beats adjacent, so a one-off render never has to move a file to get out of its own way.
+#[test]
+fn an_explicit_style_wins_over_a_sibling() {
+    let dir = std::env::temp_dir().join("cuesheet-cli-precedence");
+    let _ = std::fs::remove_dir_all(&dir);
+    std::fs::create_dir_all(&dir).unwrap();
+    let doc = dir.join("run.cuesheet");
+    std::fs::copy("examples/partition.cuesheet", &doc).unwrap();
+    std::fs::write(dir.join("cuesheet.cuestyle"), "style arrow color=#abcdef").unwrap();
+    let other = dir.join("other.cuestyle");
+    std::fs::write(&other, "style arrow color=#123456").unwrap();
+
+    let o = run(&["render", doc.to_str().unwrap(), "--style", other.to_str().unwrap()]);
+    assert!(o.status.success(), "{}", err(&o));
+    assert!(out(&o).contains("#123456"), "the named sheet did not win");
+    assert!(!out(&o).contains("#abcdef"), "the sibling leaked in");
+}
+
+/// A named sheet that is not there is a typo, not an invitation to fall back to the sibling.
+#[test]
+fn a_missing_named_sheet_is_an_error_even_with_a_sibling_present() {
+    let dir = std::env::temp_dir().join("cuesheet-cli-missing-named");
+    let _ = std::fs::remove_dir_all(&dir);
+    std::fs::create_dir_all(&dir).unwrap();
+    let doc = dir.join("run.cuesheet");
+    std::fs::copy("examples/partition.cuesheet", &doc).unwrap();
+    std::fs::write(dir.join("cuesheet.cuestyle"), "style arrow color=#abcdef").unwrap();
+
+    let o = run(&["render", doc.to_str().unwrap(), "--style", "nowhere/at/all.cuestyle"]);
+    assert!(!o.status.success());
+    assert!(err(&o).contains("all.cuestyle"), "{}", err(&o));
+}

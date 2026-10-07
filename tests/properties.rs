@@ -14,7 +14,7 @@ const RUNS: [&str; 4] = [
     include_str!("../examples/mutex-egalites.cuesheet"),
 ];
 const NAMES: [&str; 4] = ["relais-manquant", "showcase", "partition", "mutex-egalites"];
-const STYLE: &str = include_str!("../examples/course.cuestyle");
+const STYLE: &str = include_str!("../examples/cuesheet.cuestyle");
 
 fn picture(src: &str, style: Option<&str>, relax: bool) -> Picture {
     let doc = parse::document(src).expect("example should parse");

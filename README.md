@@ -9,9 +9,16 @@ trigger. This is the same thing for a distributed run, and it pairs with
 [cuelight](https://github.com/OlivierLmr/cuelight), the simulator that produces the runs.
 
 ```sh
-cuesheet render run.cuesheet --style course.cuestyle --out run.svg
+cuesheet render run.cuesheet --style course.cuestyle --open   # writes and shows run.html
+cuesheet render run.cuesheet --out run.svg                    # a cuesheet.cuestyle beside it
 cuelight viz --journal store/latest/journal.jsonl --format cuesheet   # writes messages.cuesheet
 ```
+
+`--style` is required, because the built-in defaults know how to draw a lifeline and an arrow but
+nothing about *your* words: without a sheet every kind comes out as a bare dot carrying its own
+name. The one way round naming it is to put a `cuesheet.cuestyle` **beside** the document, which is
+then found on its own. Only beside it — searching up the directory tree would make which sheet
+applied depend on where the file happened to sit.
 
 ## Two files
 

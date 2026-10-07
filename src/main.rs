@@ -1,5 +1,9 @@
 //! `cuesheet render <doc> [--style S] [--out F] [--format svg|png|html] [--open]`
 //!
+//! `--style` is required unless a `cuesheet.cuestyle` sits beside the document. Only beside it:
+//! searching up the ancestry would make which sheet applied depend on where the file happened to
+//! be, which is the kind of action at a distance a reproducible renderer has no business having.
+//!
 //! Four flags. Everything that filters is v2: a blacklist beside a whitelist is two ways to say
 //! one thing, and a filter is hard to design before knowing what is actually unreadable.
 
@@ -8,12 +12,16 @@ use std::io::Write;
 use std::path::PathBuf;
 use std::process::ExitCode;
 
+/// The sheet a document is rendered with when none is named: this, and only beside the document.
+const SHEET: &str = "cuesheet.cuestyle";
+
 const USAGE: &str = "\
 cuesheet — draws a distributed run as a space-time diagram
 
   cuesheet render <doc.cuesheet> [options]
 
-  --style <file.cuestyle>  styles, laid over the built-in defaults
+  --style <file.cuestyle>  styles, laid over the built-in defaults. Required
+                           unless a cuesheet.cuestyle sits beside the document
   --out <file>             where to write; stdout if absent
   --format svg|png|html    defaults to the extension of --out; else html
                            when opening, svg when writing to stdout
@@ -99,16 +107,29 @@ fn run(argv: &[String]) -> Result<(), String> {
     let doc = cuesheet::parse::document(&src)
         .map_err(|e| format!("{}:{e}", doc_path.display()))?;
 
-    let style_src = match &a.style {
-        Some(p) => Some(std::fs::read_to_string(p).map_err(|e| format!("{}: {e}", p.display()))?),
-        None => None,
-    };
-    let sheet = cuesheet::stylesheet(style_src.as_deref()).map_err(|e| {
-        match &a.style {
-            Some(p) => format!("{}:{e}", p.display()),
-            None => format!("built-in style sheet:{e}"),
+    // A sheet is not optional. The built-in defaults know how to draw a lifeline and an arrow, but
+    // nothing about *this* document's words, so without one every kind comes out as a bare dot
+    // carrying its own name — a page that looks like the tool is poor rather than like a flag is
+    // missing. Saying so is the only honest option, and the sibling rule is what keeps it from
+    // being a nuisance: a sheet beside the document is found without being named.
+    let style_path = match &a.style {
+        Some(p) => p.clone(),
+        None => {
+            let beside = doc_path.with_file_name(SHEET);
+            if !beside.is_file() {
+                return Err(format!(
+                    "no style sheet: pass --style, or put a `{SHEET}` beside the document \
+                     (looked for {})",
+                    beside.display()
+                ));
+            }
+            beside
         }
-    })?;
+    };
+    let style_src = std::fs::read_to_string(&style_path)
+        .map_err(|e| format!("{}: {e}", style_path.display()))?;
+    let sheet = cuesheet::stylesheet(Some(&style_src))
+        .map_err(|e| format!("{}:{e}", style_path.display()))?;
 
     let format = a
         .format
