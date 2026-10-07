@@ -23,6 +23,9 @@ const FOOTER: f64 = 34.0;
 const LABEL_SIZE: f64 = 11.0;
 const HEAD_SIZE: f64 = 13.0;
 const GUTTER_SIZE: f64 = 11.0;
+/// Baseline-to-baseline room a gutter number needs. Below it the number is dropped rather than
+/// printed over its neighbour.
+const GUTTER_MIN_GAP: f64 = GUTTER_SIZE + 2.0;
 /// How tall a collapsed quiet stretch is drawn, in the compressed axis.
 const BREAK_HEIGHT: f64 = 26.0;
 /// How far a stub reaches when a message never got anywhere.
@@ -1047,7 +1050,18 @@ fn shift(p: &mut Prim, dy: f64) {
 }
 
 fn gutter(prims: &mut Vec<Prim>, axis: &Axis3, d: &Diagram, pal: &Palette, plot_right: f64) {
-    let label = |prims: &mut Vec<Prim>, t: Tick, y: f64| {
+    // Two numbers closer together than the type is tall print on top of each other, and a run with
+    // several events inside a few ticks turns its own gutter into a grey smear. The gridline still
+    // marks every instant; only the number goes, and only where there was no room for it. First of
+    // a cluster wins, so the choice is the reading order rather than an accident of iteration.
+    let mut last_y: Option<f64> = None;
+    let mut label = |prims: &mut Vec<Prim>, t: Tick, y: f64| {
+        if let Some(prev) = last_y {
+            if (y - prev).abs() < GUTTER_MIN_GAP {
+                return;
+            }
+        }
+        last_y = Some(y);
         prims.push(Prim::Text {
             x: MARGIN_L - 42.0,
             y: y + 3.5,
@@ -1085,7 +1099,7 @@ fn gutter(prims: &mut Vec<Prim>, axis: &Axis3, d: &Diagram, pal: &Palette, plot_
             for w in all.windows(2) {
                 let (t0, y0) = w[0];
                 let (t1, y1) = w[1];
-                if t1 > t0 {
+                if t1 > t0 && (y1 - y0).abs() >= GUTTER_MIN_GAP * 2.0 {
                     prims.push(Prim::Text {
                         x: MARGIN_L - 42.0,
                         y: (y0 + y1) * 0.5 + 3.0,

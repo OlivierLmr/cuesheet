@@ -733,3 +733,60 @@ fn the_arrow_mark_faces_the_side_its_label_settled_on() {
     let shaft_side = (shaft.0 - lane).signum();
     assert_eq!(label_side, shaft_side, "the shaft points away from its own label");
 }
+
+// ---------------------------------------------------------------------------
+// The gutter
+// ---------------------------------------------------------------------------
+
+/// Every y where the gutter prints a number, for one run in one axis mode.
+fn tick_rows(src: &str, mode: &str) -> Vec<f64> {
+    let style = format!("{STYLE}\nstyle diagram axis={mode}");
+    let mut ys: Vec<f64> = picture(src, Some(&style), true)
+        .prims
+        .iter()
+        .filter_map(|p| match p {
+            Prim::Text { y, tag, .. } if tag.role == "tick" || tag.role == "elapsed" => Some(*y),
+            _ => None,
+        })
+        .collect();
+    ys.sort_by(|a, b| a.partial_cmp(b).unwrap());
+    ys
+}
+
+/// Compressed collapses the quiet stretches and leaves the busy ones as busy as they were, so it is
+/// the mode where a run with several events inside a few ticks used to print its instants on top of
+/// each other. The numbers were unreadable exactly where the most had happened.
+#[test]
+fn no_two_gutter_numbers_print_on_top_of_each_other() {
+    // The type is 11px; 12 is below anything that could be called legible separation, and is
+    // deliberately looser than the renderer's own threshold so the test does not merely restate it.
+    const LEGIBLE: f64 = 12.0;
+    for mode in ["linear", "compressed", "ordinal"] {
+        for (src, name) in RUNS.iter().zip(NAMES) {
+            let ys = tick_rows(src, mode);
+            for w in ys.windows(2) {
+                assert!(
+                    w[1] - w[0] >= LEGIBLE,
+                    "{name} in {mode}: gutter numbers at y={} and y={} are {:.1}px apart",
+                    w[0],
+                    w[1],
+                    w[1] - w[0]
+                );
+            }
+        }
+    }
+}
+
+/// Dropping a crowded number must not become dropping the axis. The gridline still marks every
+/// instant, and enough numbers survive to read the page by.
+#[test]
+fn the_gutter_still_carries_numbers_after_the_crowded_ones_are_dropped() {
+    for mode in ["linear", "compressed", "ordinal"] {
+        for (src, name) in RUNS.iter().zip(NAMES) {
+            assert!(
+                tick_rows(src, mode).len() >= 3,
+                "{name} in {mode}: the gutter kept almost nothing"
+            );
+        }
+    }
+}
