@@ -6,9 +6,39 @@
 //! same picture, which is what makes it safe to put one in a handout and the other on screen.
 
 use crate::derive::{Fate, Run};
-use crate::model::{Subject, Theme};
+use crate::model::{Axis, Subject, Theme};
 use crate::picture::{Picture, Prim};
 use crate::svg::{self, esc};
+
+/// What the page does, once it is open.
+const PAGE: &str = include_str!("../assets/page.js");
+
+/// The layout, compiled for the browser and compressed: `wasm/`, built by `tools/build-wasm.sh`.
+/// Committed, so that building cuesheet needs no WebAssembly toolchain; `tests/wasm.rs` fails
+/// when it no longer matches the sources it was built from.
+const LAYOUT: &[u8] = include_bytes!("../assets/cuesheet.wasm.gz");
+
+/// What the page needs to lay the run out again itself: the two texts the picture was made from,
+/// and which axis it was drawn with, so the page can say which one is showing.
+pub struct Source<'a> {
+    pub doc: &'a str,
+    pub style: &'a str,
+    pub axis: Axis,
+}
+
+/// Bytes as text, for a page that is one file: standard base64, padded.
+fn base64(bytes: &[u8]) -> String {
+    const ABC: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    let mut out = String::with_capacity(bytes.len().div_ceil(3) * 4);
+    for c in bytes.chunks(3) {
+        let n = (c[0] as u32) << 16 | (*c.get(1).unwrap_or(&0) as u32) << 8 | *c.get(2).unwrap_or(&0) as u32;
+        out.push(ABC[(n >> 18) as usize & 63] as char);
+        out.push(ABC[(n >> 12) as usize & 63] as char);
+        out.push(if c.len() > 1 { ABC[(n >> 6) as usize & 63] as char } else { '=' });
+        out.push(if c.len() > 2 { ABC[n as usize & 63] as char } else { '=' });
+    }
+    out
+}
 
 /// Detail blocks, keyed by the event they belong to, for the hover panel.
 fn details(pic: &Picture) -> Vec<(usize, String)> {
@@ -89,7 +119,7 @@ fn facts(run: &Run) -> String {
     format!("{{\"messages\":[{}],\"points\":[{}]}}", messages.join(","), points.join(","))
 }
 
-pub fn render(pic: &Picture, theme: Theme, run: &Run) -> String {
+pub fn render(pic: &Picture, theme: Theme, run: &Run, source: &Source) -> String {
     let body = svg::render(pic, &svg::Options { interactive: true, standalone: false });
     let title = esc(&pic.title.clone().unwrap_or_else(|| "cuesheet".into()));
 
@@ -119,7 +149,7 @@ pub fn render(pic: &Picture, theme: Theme, run: &Run) -> String {
          \x20 .p.participant {{ cursor: pointer; }}\n\
          \x20 .p.participant.on {{ text-decoration: underline; }}\n\
          \x20 #bar {{ position: fixed; left: 0; right: 0; bottom: 0; z-index: 2; display: flex; align-items: center; gap: 8px 20px; flex-wrap: wrap; padding: 8px 20px; background: {panel}; border-top: 1px solid {rule}; font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; }}\n\
-         \x20 #scale {{ display: flex; align-items: center; gap: 8px; margin-left: auto; white-space: nowrap; }}\n\
+         \x20 #scale {{ display: flex; align-items: center; gap: 8px; white-space: nowrap; }}\n\
          \x20 #scale input {{ width: 160px; }}\n\
          \x20 #scale output {{ min-width: 5ch; text-align: right; }}\n\
          \x20 #following {{ flex: 1 0 100%; opacity: .7; }}\n\
@@ -127,270 +157,19 @@ pub fn render(pic: &Picture, theme: Theme, run: &Run) -> String {
          \x20 #panel.on {{ display: block; }}\n\
          \x20 #panel b {{ display: block; margin-bottom: 6px; opacity: .6; font-weight: 400; }}\n\
          \x20 #legend {{ display: flex; flex-wrap: wrap; gap: 6px 14px; flex: 1 1 0; }}\n\
-         \x20 #legend button {{ font: inherit; color: inherit; background: none; cursor: pointer; border: 1px solid {rule}; border-radius: 3px; padding: 2px 8px; }}\n\
+         \x20 #bar button {{ font: inherit; color: inherit; background: none; cursor: pointer; border: 1px solid {rule}; border-radius: 3px; padding: 2px 8px; }}\n\
          \x20 #legend button[aria-pressed=\"false\"] {{ opacity: .4; text-decoration: line-through; }}\n\
-         \x20 #legend button:focus-visible {{ outline: 2px solid currentColor; outline-offset: 2px; }}\n"
+         \x20 #bar button:focus-visible {{ outline: 2px solid currentColor; outline-offset: 2px; }}\n\
+         \x20 #axis {{ display: flex; align-items: center; gap: 4px; margin-left: auto; white-space: nowrap; }}\n\
+         \x20 #axis button[aria-pressed=\"false\"] {{ opacity: .75; }}\n\
+         \x20 #axis button[aria-pressed=\"true\"] {{ border-color: currentColor; }}\n\
+         \x20 #axis button:disabled {{ cursor: default; }}\n\
+         \x20 #axis button:disabled[aria-pressed=\"false\"] {{ opacity: .25; }}\n\
+         \x20 #busy {{ opacity: 0; }}\n\
+         \x20 #bar[data-busy] #busy {{ opacity: .7; transition: opacity .1s .25s; }}\n"
     );
 
-    let script = r#"(() => {
-  const svg = document.querySelector('svg');
-  const panel = document.getElementById('panel');
-  const legend = document.getElementById('legend');
-  const roleOf = el => (el.getAttribute('class') || '').split(' ')[1] || '';
-
-  // Detail blocks, as written. Pretty-printed when they happen to be JSON, verbatim when not:
-  // the format never promised they were anything in particular.
-  const details = new Map();
-  for (const s of document.querySelectorAll('script.detail')) {
-    let text = s.textContent;
-    try { text = JSON.stringify(JSON.parse(text), null, 2); } catch (_) {}
-    details.set(s.dataset.event, text);
-  }
-
-  const show = (ev, role) => {
-    const text = details.get(ev);
-    if (!text) return;
-    panel.textContent = '';
-    const b = document.createElement('b');
-    b.textContent = role || ('event ' + ev);
-    panel.append(b, document.createTextNode(text));
-    panel.classList.add('on');
-  };
-  const hide = () => panel.classList.remove('on');
-
-  for (const el of svg.querySelectorAll('[data-event]')) {
-    el.addEventListener('mouseenter', () => show(el.dataset.event, roleOf(el)));
-    el.addEventListener('mouseleave', hide);
-  }
-  svg.addEventListener('mouseleave', hide);
-
-  // One toggle per kind, so a dense plot can have a whole kind taken out of it. The names are the
-  // ones the style sheet selects by, so what you learn in one transfers to the other.
-  const skip = ['lifeline', 'gridline', 'tick', 'participant', 'elapsed', ''];
-  const roles = [...new Set([...svg.querySelectorAll('.p')].map(roleOf))]
-    .filter(r => !skip.includes(r)).sort();
-
-  for (const role of roles) {
-    const b = document.createElement('button');
-    b.textContent = role;
-    b.setAttribute('aria-pressed', 'true');
-    b.addEventListener('click', () => {
-      const on = b.getAttribute('aria-pressed') === 'true';
-      b.setAttribute('aria-pressed', String(!on));
-      for (const el of svg.querySelectorAll('.p')) {
-        if (roleOf(el) === role) el.classList.toggle('dim', on);
-      }
-    });
-    legend.append(b);
-  }
-
-  // Following one thing through the run. A click on a process keeps what involves it. A click on
-  // an event keeps what it depends on and what depends on it — what happened before it and what
-  // happened after it, in the sense of the partial order a run has — and fades what is concurrent
-  // with it. The facts come from the derivation, not from the picture.
-  const run = JSON.parse(document.getElementById('run').textContent);
-  const following = document.getElementById('following');
-  const marked = [...svg.querySelectorAll('[data-event]')];
-  const labels = [...svg.querySelectorAll('.p.participant')];
-  const idle = 'click a process to keep what involves it, or an event to keep its causes and consequences';
-  let chosen = null;
-
-  const paint = (keep, text) => {
-    for (const el of marked) el.classList.toggle('off', keep !== null && !keep.has(+el.dataset.event));
-    following.textContent = text;
-  };
-  const clear = () => {
-    chosen = null;
-    for (const l of labels) l.classList.remove('on');
-    paint(null, idle);
-  };
-
-  const involving = name => {
-    const keep = new Set();
-    for (const m of run.messages) if (m.from === name || m.to === name) keep.add(m.e);
-    // What belongs to no process — the network, the run itself — is never faded: it bears on all.
-    for (const p of run.points) if (p.lane === name || p.lane === null) keep.add(p.e);
-    return keep;
-  };
-
-  const around = ev => {
-    // `since`: per process, the instant from which it has been reached by the event.
-    // `until`: per process, the instant up to which it contributed to the event.
-    const since = new Map(), until = new Map();
-    const lower = (l, t) => (!since.has(l) || t < since.get(l)) && (since.set(l, t), true);
-    const raise = (l, t) => (!until.has(l) || t > until.get(l)) && (until.set(l, t), true);
-
-    const msg = run.messages.find(m => m.e === ev);
-    const pt = run.points.find(p => p.e === ev);
-    if (msg) {
-      // A message is caused by what its sender had seen when it left, and causes what its
-      // receiver does from the moment it lands — if it lands.
-      if (msg.left) raise(msg.from, msg.depart);
-      if (msg.landed) lower(msg.to, msg.arrive);
-    } else if (pt && pt.lane !== null) {
-      raise(pt.lane, pt.t);
-      lower(pt.lane, pt.t);
-    } else {
-      return null;
-    }
-    // A message that landed carries its sender's past forward and its receiver's future back.
-    for (let moved = true; moved;) {
-      moved = false;
-      for (const m of run.messages) {
-        if (m.landed && since.has(m.from) && m.depart >= since.get(m.from)) moved = lower(m.to, m.arrive) || moved;
-        if (m.landed && until.has(m.to) && m.arrive <= until.get(m.to)) moved = raise(m.from, m.depart) || moved;
-      }
-    }
-    const keep = new Set([ev]);
-    for (const m of run.messages) {
-      if (m.left && since.has(m.from) && m.depart >= since.get(m.from)) keep.add(m.e);
-      if (m.landed && until.has(m.to) && m.arrive <= until.get(m.to)) keep.add(m.e);
-    }
-    for (const p of run.points) {
-      // What belongs to no process is never faded, here either.
-      if (p.lane === null) { keep.add(p.e); continue; }
-      if (since.has(p.lane) && p.t >= since.get(p.lane)) keep.add(p.e);
-      if (until.has(p.lane) && p.t <= until.get(p.lane)) keep.add(p.e);
-    }
-    return keep;
-  };
-
-  for (const l of labels) {
-    l.addEventListener('click', e => {
-      e.stopPropagation();
-      const name = l.textContent.trim();
-      if (chosen === 'lane:' + name) return clear();
-      clear();
-      chosen = 'lane:' + name;
-      l.classList.add('on');
-      paint(involving(name), 'what involves ' + name + ' — click it again to clear');
-    });
-  }
-  for (const el of marked) {
-    el.addEventListener('click', e => {
-      e.stopPropagation();
-      const ev = +el.dataset.event;
-      if (chosen === 'event:' + ev) return clear();
-      const keep = around(ev);
-      if (keep === null) return;
-      clear();
-      chosen = 'event:' + ev;
-      paint(keep, 'causes and consequences of the ' + (roleOf(el) || 'event') + ' you clicked — click it again to clear');
-    });
-  }
-  svg.addEventListener('click', clear);
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') clear(); });
-  clear();
-
-  // Stretching time. The picture is laid out once, at one scale; this moves what it drew rather
-  // than laying it out again. Whatever has a duration is stretched — an arrow, a lifeline, a span
-  // — and whatever marks an instant is carried along at its own size, so a dot stays a dot and
-  // text stays legible. Labels keep the places they settled into at the original scale, which is
-  // the one thing a real second layout would do better: squeezed hard, they can come to overlap.
-  const top = Math.min(...[...svg.querySelectorAll('.p.lifeline')].flatMap(l => [+l.getAttribute('y1'), +l.getAttribute('y2')]), Infinity);
-  const origin = Number.isFinite(top) ? top : 0;
-  const [, , boxW, boxH] = svg.getAttribute('viewBox').split(' ').map(Number);
-  const lasting = new Set(run.points.filter(p => p.lasts).map(p => p.e));
-  const stretched = new Set(['arrow', 'lifeline', 'gridline', 'tick']);
-  const num = (el, a) => +el.getAttribute(a);
-
-  // What each element was, read once: scaling always starts from the original, so going up and
-  // back down returns exactly where it began.
-  const shapes = [];
-  for (const el of svg.querySelectorAll('line, rect, circle, polygon, path, text')) {
-    if (el.closest('defs')) continue;
-    const kind = el.tagName.toLowerCase();
-    const lasts = stretched.has(roleOf(el)) || lasting.has(+el.dataset.event);
-    if (kind === 'line') shapes.push({ el, kind, lasts, y1: num(el, 'y1'), y2: num(el, 'y2') });
-    else if (kind === 'rect') shapes.push({ el, kind, lasts: lasts || !el.classList.contains('p'), y: num(el, 'y'), h: num(el, 'height') });
-    else if (kind === 'circle') shapes.push({ el, kind, y: num(el, 'cy') });
-    else if (kind === 'polygon') shapes.push({ el, kind, pts: el.getAttribute('points').split(' ').map(p => p.split(',').map(Number)) });
-    else if (kind === 'path') shapes.push({ el, kind, d: el.getAttribute('d').split(' ') });
-    else {
-      const turn = /rotate\(([-\d.]+) ([-\d.]+) ([-\d.]+)\)/.exec(el.getAttribute('transform') || '');
-      shapes.push({ el, kind, y: num(el, 'y'), turn: turn && turn.slice(1).map(Number) });
-    }
-  }
-
-  let factor = 1;
-  const stretch = k => {
-    const at = y => y <= origin ? y : origin + (y - origin) * k;
-    const r4 = v => Math.round(v * 1e4) / 1e4;
-    for (const s of shapes) {
-      const el = s.el;
-      if (s.kind === 'line') {
-        if (s.lasts) { el.setAttribute('y1', r4(at(s.y1))); el.setAttribute('y2', r4(at(s.y2))); }
-        else { const mid = (s.y1 + s.y2) / 2, d = at(mid) - mid; el.setAttribute('y1', r4(s.y1 + d)); el.setAttribute('y2', r4(s.y2 + d)); }
-      } else if (s.kind === 'rect') {
-        if (s.lasts) { el.setAttribute('y', r4(at(s.y))); el.setAttribute('height', r4(Math.max(at(s.y + s.h) - at(s.y), 0.5))); }
-        else { const mid = s.y + s.h / 2; el.setAttribute('y', r4(s.y + at(mid) - mid)); }
-      } else if (s.kind === 'circle') {
-        el.setAttribute('cy', r4(at(s.y)));
-      } else if (s.kind === 'polygon') {
-        const mid = s.pts.reduce((a, p) => a + p[1], 0) / s.pts.length, d = at(mid) - mid;
-        el.setAttribute('points', s.pts.map(p => p[0] + ',' + r4(p[1] + d)).join(' '));
-      } else if (s.kind === 'path') {
-        // Absolute `M x y L x y … Z`: every second number is a height.
-        let odd = false;
-        el.setAttribute('d', s.d.map(tok => {
-          if (isNaN(tok)) { odd = false; return tok; }
-          odd = !odd;
-          return odd ? tok : r4(at(+tok));
-        }).join(' '));
-      } else {
-        el.setAttribute('y', r4(at(s.y)));
-        if (s.turn) {
-          // A label rides its arrow's slope, and the slope changes with the scale.
-          const [deg, cx, cy] = s.turn;
-          const now = Math.atan(Math.tan(deg * Math.PI / 180) * k) * 180 / Math.PI;
-          el.setAttribute('transform', 'rotate(' + r4(now) + ' ' + cx + ' ' + r4(at(cy)) + ')');
-        }
-      }
-    }
-    svg.setAttribute('viewBox', '0 0 ' + boxW + ' ' + r4(at(boxH)));
-    factor = k;
-  };
-
-  // What the reader is looking at stays where it is: the instant at the middle of the window
-  // before the change is put back at the middle after it.
-  // The page turns off the browser's own attempt at the same thing (`overflow-anchor`): where a
-  // browser has one, the two corrections add up and the view jumps by as much again.
-  const rescale = k => {
-    const box = svg.getBoundingClientRect();
-    const px = box.width / boxW;
-    const seen = ((window.innerHeight - bar.offsetHeight) / 2 - box.top) / px;
-    const instant = seen <= origin ? seen : origin + (seen - origin) / factor;
-    // Where to be afterwards is worked out before anything moves, and asked for outright. A
-    // relative scroll goes wrong when the page shrinks: the browser first pulls the view back
-    // inside the shorter page, and the step is then taken from the wrong place.
-    const after = instant <= origin ? instant : origin + (instant - origin) * k;
-    const target = window.scrollY + (after - seen) * px;
-    stretch(k);
-    window.scrollTo(0, target);
-  };
-
-  // One band holds every control, fixed at the foot of the window. Its height depends on how many
-  // kinds the run has, so it is measured, and the page leaves that much room under the drawing:
-  // nothing of the run can end up behind it.
-  const bar = document.getElementById('bar');
-  const room = () => document.documentElement.style.setProperty('--bar', bar.offsetHeight + 'px');
-  room();
-  window.addEventListener('resize', room);
-
-  const slider = document.querySelector('#scale input');
-  const shown = document.querySelector('#scale output');
-  let pending = null;
-  slider.addEventListener('input', () => {
-    // The slider runs on a logarithm, so halving and doubling are the same distance apart.
-    const k = Math.pow(2, +slider.value);
-    shown.textContent = '×' + (k >= 10 ? k.toFixed(0) : k.toFixed(2));
-    // A timer rather than an animation frame: a frame never comes while the page is in the
-    // background, and the scale would silently stay where it was.
-    if (pending === null) setTimeout(() => { rescale(pending); pending = null; }, 16);
-    pending = k;
-  });
-  slider.addEventListener('dblclick', () => { slider.value = 0; slider.dispatchEvent(new Event('input')); });
-})();"#;
+    let script = PAGE.trim_end();
 
     format!(
         "<!doctype html>\n<html lang=\"en\">\n<meta charset=\"utf-8\">\n\
@@ -400,12 +179,27 @@ pub fn render(pic: &Picture, theme: Theme, run: &Run) -> String {
          <footer id=\"bar\">\n\
          \x20 <div id=\"following\"></div>\n\
          \x20 <div id=\"legend\"></div>\n\
+         \x20 <span id=\"axis\" role=\"group\" aria-label=\"time axis\">\
+         <span id=\"busy\" role=\"status\">laying out…</span>\
+         <button data-axis=\"0\" disabled title=\"an instant takes as much room as it lasted: the slope of an arrow is its flight time\">linear</button>\
+         <button data-axis=\"1\" disabled title=\"linear, with each long quiet stretch folded into a marked break\">compressed</button>\
+         <button data-axis=\"2\" disabled title=\"one row per distinct instant: order only, no durations\">ordinal</button></span>\n\
          \x20 <label id=\"scale\" title=\"stretch or squeeze time; double-click to reset\">time <input type=\"range\" min=\"-4\" max=\"3\" step=\"0.05\" value=\"0\"><output>×1.00</output></label>\n\
          </footer>\n\
          <div id=\"panel\" role=\"status\" aria-live=\"polite\"></div>\n\
          {data}<script type=\"application/json\" id=\"run\">{facts}</script>\n\
+         <script type=\"application/json\" id=\"source\">{{\"doc\":{doc},\"style\":{style},\"axis\":{axis}}}</script>\n\
+         <script type=\"application/octet-stream\" id=\"layout\">{layout}</script>\n\
          <script>\n{script}\n</script>\n</html>\n",
-        facts = facts(run)
+        facts = facts(run),
+        doc = js(source.doc),
+        style = js(source.style),
+        axis = match source.axis {
+            Axis::Linear => 0,
+            Axis::Compressed => 1,
+            Axis::Ordinal => 2,
+        },
+        layout = base64(LAYOUT)
     )
 }
 
@@ -413,6 +207,9 @@ pub fn render(pic: &Picture, theme: Theme, run: &Run) -> String {
 mod tests {
     use super::*;
     use crate::{derive, font, layout, parse};
+
+    /// For the tests that are about something else than laying out again.
+    const NO_SOURCE: Source = Source { doc: "", style: "", axis: Axis::Linear };
 
     fn build(src: &str) -> (Picture, Run) {
         let doc = parse::document(src).unwrap();
@@ -423,7 +220,7 @@ mod tests {
 
     fn page(src: &str) -> String {
         let (pic, run) = build(src);
-        render(&pic, Theme::Light, &run)
+        render(&pic, Theme::Light, &run, &NO_SOURCE)
     }
 
     /// The guarantee the whole split rests on: the page holds the same SVG, not another drawing.
@@ -431,7 +228,7 @@ mod tests {
     fn the_page_inlines_the_same_geometry_the_static_file_has() {
         let (pic, run) = build("0 n0 -> n1 .rb +10\n5 n1 deliver\n20 run end");
         let stat = svg::render(&pic, &svg::Options::default());
-        let page = render(&pic, Theme::Light, &run);
+        let page = render(&pic, Theme::Light, &run, &NO_SOURCE);
 
         let coords: Vec<&str> = stat
             .split_whitespace()
@@ -463,8 +260,8 @@ mod tests {
     #[test]
     fn both_themes_paint_a_background() {
         let (pic, run) = build("0 n0 deliver");
-        assert!(render(&pic, Theme::Light, &run).contains("background: #fafafb"));
-        assert!(render(&pic, Theme::Dark, &run).contains("background: #0e1116"));
+        assert!(render(&pic, Theme::Light, &run, &NO_SOURCE).contains("background: #fafafb"));
+        assert!(render(&pic, Theme::Dark, &run, &NO_SOURCE).contains("background: #0e1116"));
     }
 
     #[test]
@@ -501,7 +298,7 @@ mod tests {
         let sheet = crate::stylesheet(Some(sheet)).unwrap();
         let run = derive::run(&doc, &sheet);
         let pic = layout::build(&doc, &sheet, &run, &font::Font::embedded());
-        let out = render(&pic, Theme::Light, &run);
+        let out = render(&pic, Theme::Light, &run, &NO_SOURCE);
         assert!(out.contains(r#""left":true,"landed":false"#), "{out}");
     }
 
@@ -519,6 +316,36 @@ mod tests {
         let drawing = &out[out.find("<svg").unwrap()..out.find("</svg>").unwrap()];
         assert!(!drawing.contains("<title>"), "{drawing}");
         assert!(drawing.contains("aria-label=\"a run\""), "{drawing}");
+    }
+
+    /// The page lays the run out again itself, so it must hold what the first layout was given:
+    /// the document, the caller's sheet, the axis showing, and the layout to run them through.
+    #[test]
+    fn the_page_carries_what_it_takes_to_lay_the_run_out_again() {
+        let src = "0 n0 -> n1 .rb +10 \"a</script>\"";
+        let (pic, run) = build(src);
+        let out = render(
+            &pic,
+            Theme::Light,
+            &run,
+            &Source { doc: src, style: "style diagram axis=ordinal", axis: Axis::Ordinal },
+        );
+        assert!(out.contains(r#""style":"style diagram axis=ordinal","axis":2}"#), "no sheet or axis");
+        // The document is there as written, and cannot close the element that carries it.
+        assert!(out.contains(r#"{"doc":"0 n0 -> n1 .rb +10 \"a\u003c/script>\"","#), "no document");
+        // The compiled layout, as text: a gzip stream starts with 1f 8b, which base64 writes `H4`.
+        assert!(out.contains("id=\"layout\">H4"), "no layout");
+        for axis in ["linear", "compressed", "ordinal"] {
+            assert!(out.contains(&format!(">{axis}</button>")), "no {axis} button");
+        }
+    }
+
+    #[test]
+    fn base64_pads_what_does_not_fill_three_bytes() {
+        assert_eq!(base64(b""), "");
+        assert_eq!(base64(b"f"), "Zg==");
+        assert_eq!(base64(b"fo"), "Zm8=");
+        assert_eq!(base64(b"foobar"), "Zm9vYmFy");
     }
 
     #[test]

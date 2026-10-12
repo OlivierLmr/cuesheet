@@ -1,0 +1,23 @@
+[package]
+name = "cuesheet-wasm"
+version = "0.0.0"
+edition = "2021"
+publish = false
+description = "cuesheet's layout, compiled for the browser: the page lays a run out again when its reader changes the axis or the scale"
+
+# Not a member of anything: it is built by tools/build-wasm.sh alone, and its output is committed
+# as assets/cuesheet.wasm.gz, so that building cuesheet itself needs no WebAssembly toolchain.
+[workspace]
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+cuesheet = { path = ".." }
+
+[profile.release]
+opt-level = 2
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
