@@ -1,0 +1,39 @@
+# The HTML page carries the layout compiled for the browser, committed as assets/cuesheet.wasm.gz
+# so that installing cuesheet needs no WebAssembly toolchain. This keeps that file true without
+# anyone remembering to: on a branch whose layout sources changed, it is rebuilt and committed
+# back to the branch. Then the tests run, and they refuse a build that does not match its sources —
+# so nothing stale can reach main, where this job tests and never writes.
+name: browser build
+
+on:
+  push:
+    branches: ['**']
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Only when the sources moved: two toolchains do not give the same bytes for the same
+      # sources, and rebuilding every time would commit a new file for no change at all.
+      - name: Is the committed build still the one these sources give?
+        id: build
+        run: cargo test --quiet --test wasm || echo "stale=yes" >> "$GITHUB_OUTPUT"
+
+      - name: Rebuild it
+        if: steps.build.outputs.stale == 'yes' && github.ref != 'refs/heads/main'
+        run: |
+          rustup target add wasm32-unknown-unknown
+          tools/build-wasm.sh
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/cuesheet.wasm.gz assets/cuesheet.wasm.stamp
+          git commit -m "Rebuild the layout the page carries, from the sources of ${GITHUB_SHA::7}"
+          git push
+
+      - name: Test
+        run: cargo test

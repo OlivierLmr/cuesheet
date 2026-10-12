@@ -90,6 +90,14 @@ the same bytes on every machine — which is what the golden tests rest on.
 
 PNG needs `--features png`.
 
+The page can lay the run out again: three buttons switch the time axis between `linear`,
+`compressed` and `ordinal`, and a slider stretches time, with labels placed anew each time. It does
+so with the layout itself, compiled to WebAssembly and carried in the page, which stays one file
+and asks nothing of the network. That build is committed as `assets/cuesheet.wasm.gz`, so building
+cuesheet needs no WebAssembly toolchain. After a change to the layout, pushing the branch is
+enough: a job rebuilds that file and commits it to the branch (`.github/workflows/`). Until then
+`cargo test` says the build is out of date; `tools/build-wasm.sh` makes it again by hand.
+
 ## Not in v1
 
 Filtering (`--only`, `--between`), folding lanes together, and diffing two runs. The compressed and

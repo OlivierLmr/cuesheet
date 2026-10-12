@@ -123,12 +123,22 @@ pub fn render(pic: &Picture, opt: &Options) -> String {
             n(pic.height)
         ));
     }
+    if opt.interactive {
+        let name = pic.title.clone().unwrap_or_else(|| "space-time diagram".into());
+        s.push_str(&format!(" aria-label=\"{}\"", esc(&name)));
+    }
     s.push_str(">\n");
 
     // An accessible name, and the provenance the emitter wrote, so a figure in a handout can name
     // the run behind it.
+    // A `<title>` is the picture's name for a screen reader, and a browser also shows it as a
+    // tooltip over every pixel of the drawing. In a static file that is harmless. In the page, the
+    // pointer is how one reads an event, and a tooltip repeating "space-time diagram" sits on top
+    // of it: there the name goes in the attribute a browser does not display.
     let title = pic.title.clone().unwrap_or_else(|| "space-time diagram".into());
-    s.push_str(&format!("  <title>{}</title>\n", esc(&title)));
+    if !opt.interactive {
+        s.push_str(&format!("  <title>{}</title>\n", esc(&title)));
+    }
     if !pic.header.is_empty() {
         s.push_str(&format!("  <desc>{}</desc>\n", esc(&pic.header.join("\n"))));
     }

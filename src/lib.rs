@@ -11,6 +11,9 @@
 
 pub mod derive;
 pub mod font;
+// The page carries the layout compiled for the browser, and that build is made from this crate:
+// it must not carry the page, or each build would hold the one before it.
+#[cfg(not(target_arch = "wasm32"))]
 pub mod html;
 pub mod layout;
 pub mod lex;
