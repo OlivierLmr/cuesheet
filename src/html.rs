@@ -110,7 +110,7 @@ pub fn render(pic: &Picture, theme: Theme, run: &Run) -> String {
         "  :root {{ color-scheme: {scheme}; }}\n\
          \x20 html {{ overflow-anchor: none; }}\n\
          \x20 body {{ margin: 0; background: {bg}; color: {fg}; font: 14px/1.5 Inter, ui-sans-serif, system-ui, sans-serif; }}\n\
-         \x20 main {{ padding: 20px; }}\n\
+         \x20 main {{ padding: 20px 20px calc(var(--bar, 64px) + 20px); }}\n\
          \x20 .plot {{ overflow: auto; }}\n\
          \x20 svg {{ max-width: 100%; height: auto; display: block; }}\n\
          \x20 .p[data-event] {{ cursor: pointer; }}\n\
@@ -118,14 +118,15 @@ pub fn render(pic: &Picture, theme: Theme, run: &Run) -> String {
          \x20 .off {{ opacity: .07; }}\n\
          \x20 .p.participant {{ cursor: pointer; }}\n\
          \x20 .p.participant.on {{ text-decoration: underline; }}\n\
-         \x20 #scale {{ position: fixed; top: 8px; right: 16px; z-index: 2; display: flex; align-items: center; gap: 8px; background: {panel}; border: 1px solid {rule}; border-radius: 4px; padding: 4px 10px; font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; }}\n\
+         \x20 #bar {{ position: fixed; left: 0; right: 0; bottom: 0; z-index: 2; display: flex; align-items: center; gap: 8px 20px; flex-wrap: wrap; padding: 8px 20px; background: {panel}; border-top: 1px solid {rule}; font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; }}\n\
+         \x20 #scale {{ display: flex; align-items: center; gap: 8px; margin-left: auto; white-space: nowrap; }}\n\
          \x20 #scale input {{ width: 160px; }}\n\
          \x20 #scale output {{ min-width: 5ch; text-align: right; }}\n\
-         \x20 #following {{ padding: 0 20px 12px; font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; opacity: .7; }}\n\
-         \x20 #panel {{ position: fixed; right: 16px; bottom: 16px; max-width: min(46ch, 90vw); max-height: 50vh; overflow: auto; background: {panel}; border: 1px solid {rule}; border-radius: 4px; padding: 10px 12px; font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre-wrap; display: none; }}\n\
+         \x20 #following {{ flex: 1 0 100%; opacity: .7; }}\n\
+         \x20 #panel {{ position: fixed; right: 16px; bottom: calc(var(--bar, 64px) + 12px); z-index: 3; max-width: min(46ch, 90vw); max-height: 50vh; overflow: auto; background: {panel}; border: 1px solid {rule}; border-radius: 4px; padding: 10px 12px; font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre-wrap; display: none; }}\n\
          \x20 #panel.on {{ display: block; }}\n\
          \x20 #panel b {{ display: block; margin-bottom: 6px; opacity: .6; font-weight: 400; }}\n\
-         \x20 #legend {{ display: flex; flex-wrap: wrap; gap: 6px 14px; padding: 0 20px 16px; font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; }}\n\
+         \x20 #legend {{ display: flex; flex-wrap: wrap; gap: 6px 14px; flex: 1 1 0; }}\n\
          \x20 #legend button {{ font: inherit; color: inherit; background: none; cursor: pointer; border: 1px solid {rule}; border-radius: 3px; padding: 2px 8px; }}\n\
          \x20 #legend button[aria-pressed=\"false\"] {{ opacity: .4; text-decoration: line-through; }}\n\
          \x20 #legend button:focus-visible {{ outline: 2px solid currentColor; outline-offset: 2px; }}\n"
@@ -357,7 +358,7 @@ pub fn render(pic: &Picture, theme: Theme, run: &Run) -> String {
   const rescale = k => {
     const box = svg.getBoundingClientRect();
     const px = box.width / boxW;
-    const seen = (window.innerHeight / 2 - box.top) / px;
+    const seen = ((window.innerHeight - bar.offsetHeight) / 2 - box.top) / px;
     const instant = seen <= origin ? seen : origin + (seen - origin) / factor;
     // Where to be afterwards is worked out before anything moves, and asked for outright. A
     // relative scroll goes wrong when the page shrinks: the browser first pulls the view back
@@ -367,6 +368,14 @@ pub fn render(pic: &Picture, theme: Theme, run: &Run) -> String {
     stretch(k);
     window.scrollTo(0, target);
   };
+
+  // One band holds every control, fixed at the foot of the window. Its height depends on how many
+  // kinds the run has, so it is measured, and the page leaves that much room under the drawing:
+  // nothing of the run can end up behind it.
+  const bar = document.getElementById('bar');
+  const room = () => document.documentElement.style.setProperty('--bar', bar.offsetHeight + 'px');
+  room();
+  window.addEventListener('resize', room);
 
   const slider = document.querySelector('#scale input');
   const shown = document.querySelector('#scale output');
@@ -388,9 +397,11 @@ pub fn render(pic: &Picture, theme: Theme, run: &Run) -> String {
          <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n\
          <title>{title}</title>\n<style>\n{css}</style>\n\
          <main>\n  <div class=\"plot\">\n{body}  </div>\n</main>\n\
-         <label id=\"scale\" title=\"stretch or squeeze time; double-click to reset\">time <input type=\"range\" min=\"-4\" max=\"3\" step=\"0.05\" value=\"0\"><output>×1.00</output></label>\n\
-         <div id=\"following\"></div>\n\
-         <div id=\"legend\"></div>\n\
+         <footer id=\"bar\">\n\
+         \x20 <div id=\"following\"></div>\n\
+         \x20 <div id=\"legend\"></div>\n\
+         \x20 <label id=\"scale\" title=\"stretch or squeeze time; double-click to reset\">time <input type=\"range\" min=\"-4\" max=\"3\" step=\"0.05\" value=\"0\"><output>×1.00</output></label>\n\
+         </footer>\n\
          <div id=\"panel\" role=\"status\" aria-live=\"polite\"></div>\n\
          {data}<script type=\"application/json\" id=\"run\">{facts}</script>\n\
          <script>\n{script}\n</script>\n</html>\n",
