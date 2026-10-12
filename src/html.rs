@@ -83,7 +83,7 @@ fn facts(run: &Run) -> String {
         .chain(
             run.spans
                 .iter()
-                .map(|s| format!("{{\"e\":{},\"lane\":{},\"t\":{}}}", s.event, lane(&s.subject), s.start)),
+                .map(|s| format!("{{\"e\":{},\"lane\":{},\"t\":{},\"lasts\":true}}", s.event, lane(&s.subject), s.start)),
         )
         .collect();
     format!("{{\"messages\":[{}],\"points\":[{}]}}", messages.join(","), points.join(","))
@@ -108,6 +108,7 @@ pub fn render(pic: &Picture, theme: Theme, run: &Run) -> String {
 
     let css = format!(
         "  :root {{ color-scheme: {scheme}; }}\n\
+         \x20 html {{ overflow-anchor: none; }}\n\
          \x20 body {{ margin: 0; background: {bg}; color: {fg}; font: 14px/1.5 Inter, ui-sans-serif, system-ui, sans-serif; }}\n\
          \x20 main {{ padding: 20px; }}\n\
          \x20 .plot {{ overflow: auto; }}\n\
@@ -117,6 +118,9 @@ pub fn render(pic: &Picture, theme: Theme, run: &Run) -> String {
          \x20 .off {{ opacity: .07; }}\n\
          \x20 .p.participant {{ cursor: pointer; }}\n\
          \x20 .p.participant.on {{ text-decoration: underline; }}\n\
+         \x20 #scale {{ position: fixed; top: 8px; right: 16px; z-index: 2; display: flex; align-items: center; gap: 8px; background: {panel}; border: 1px solid {rule}; border-radius: 4px; padding: 4px 10px; font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; }}\n\
+         \x20 #scale input {{ width: 160px; }}\n\
+         \x20 #scale output {{ min-width: 5ch; text-align: right; }}\n\
          \x20 #following {{ padding: 0 20px 12px; font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; opacity: .7; }}\n\
          \x20 #panel {{ position: fixed; right: 16px; bottom: 16px; max-width: min(46ch, 90vw); max-height: 50vh; overflow: auto; background: {panel}; border: 1px solid {rule}; border-radius: 4px; padding: 10px 12px; font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre-wrap; display: none; }}\n\
          \x20 #panel.on {{ display: block; }}\n\
@@ -276,6 +280,107 @@ pub fn render(pic: &Picture, theme: Theme, run: &Run) -> String {
   svg.addEventListener('click', clear);
   document.addEventListener('keydown', e => { if (e.key === 'Escape') clear(); });
   clear();
+
+  // Stretching time. The picture is laid out once, at one scale; this moves what it drew rather
+  // than laying it out again. Whatever has a duration is stretched — an arrow, a lifeline, a span
+  // — and whatever marks an instant is carried along at its own size, so a dot stays a dot and
+  // text stays legible. Labels keep the places they settled into at the original scale, which is
+  // the one thing a real second layout would do better: squeezed hard, they can come to overlap.
+  const top = Math.min(...[...svg.querySelectorAll('.p.lifeline')].flatMap(l => [+l.getAttribute('y1'), +l.getAttribute('y2')]), Infinity);
+  const origin = Number.isFinite(top) ? top : 0;
+  const [, , boxW, boxH] = svg.getAttribute('viewBox').split(' ').map(Number);
+  const lasting = new Set(run.points.filter(p => p.lasts).map(p => p.e));
+  const stretched = new Set(['arrow', 'lifeline', 'gridline', 'tick']);
+  const num = (el, a) => +el.getAttribute(a);
+
+  // What each element was, read once: scaling always starts from the original, so going up and
+  // back down returns exactly where it began.
+  const shapes = [];
+  for (const el of svg.querySelectorAll('line, rect, circle, polygon, path, text')) {
+    if (el.closest('defs')) continue;
+    const kind = el.tagName.toLowerCase();
+    const lasts = stretched.has(roleOf(el)) || lasting.has(+el.dataset.event);
+    if (kind === 'line') shapes.push({ el, kind, lasts, y1: num(el, 'y1'), y2: num(el, 'y2') });
+    else if (kind === 'rect') shapes.push({ el, kind, lasts: lasts || !el.classList.contains('p'), y: num(el, 'y'), h: num(el, 'height') });
+    else if (kind === 'circle') shapes.push({ el, kind, y: num(el, 'cy') });
+    else if (kind === 'polygon') shapes.push({ el, kind, pts: el.getAttribute('points').split(' ').map(p => p.split(',').map(Number)) });
+    else if (kind === 'path') shapes.push({ el, kind, d: el.getAttribute('d').split(' ') });
+    else {
+      const turn = /rotate\(([-\d.]+) ([-\d.]+) ([-\d.]+)\)/.exec(el.getAttribute('transform') || '');
+      shapes.push({ el, kind, y: num(el, 'y'), turn: turn && turn.slice(1).map(Number) });
+    }
+  }
+
+  let factor = 1;
+  const stretch = k => {
+    const at = y => y <= origin ? y : origin + (y - origin) * k;
+    const r4 = v => Math.round(v * 1e4) / 1e4;
+    for (const s of shapes) {
+      const el = s.el;
+      if (s.kind === 'line') {
+        if (s.lasts) { el.setAttribute('y1', r4(at(s.y1))); el.setAttribute('y2', r4(at(s.y2))); }
+        else { const mid = (s.y1 + s.y2) / 2, d = at(mid) - mid; el.setAttribute('y1', r4(s.y1 + d)); el.setAttribute('y2', r4(s.y2 + d)); }
+      } else if (s.kind === 'rect') {
+        if (s.lasts) { el.setAttribute('y', r4(at(s.y))); el.setAttribute('height', r4(Math.max(at(s.y + s.h) - at(s.y), 0.5))); }
+        else { const mid = s.y + s.h / 2; el.setAttribute('y', r4(s.y + at(mid) - mid)); }
+      } else if (s.kind === 'circle') {
+        el.setAttribute('cy', r4(at(s.y)));
+      } else if (s.kind === 'polygon') {
+        const mid = s.pts.reduce((a, p) => a + p[1], 0) / s.pts.length, d = at(mid) - mid;
+        el.setAttribute('points', s.pts.map(p => p[0] + ',' + r4(p[1] + d)).join(' '));
+      } else if (s.kind === 'path') {
+        // Absolute `M x y L x y … Z`: every second number is a height.
+        let odd = false;
+        el.setAttribute('d', s.d.map(tok => {
+          if (isNaN(tok)) { odd = false; return tok; }
+          odd = !odd;
+          return odd ? tok : r4(at(+tok));
+        }).join(' '));
+      } else {
+        el.setAttribute('y', r4(at(s.y)));
+        if (s.turn) {
+          // A label rides its arrow's slope, and the slope changes with the scale.
+          const [deg, cx, cy] = s.turn;
+          const now = Math.atan(Math.tan(deg * Math.PI / 180) * k) * 180 / Math.PI;
+          el.setAttribute('transform', 'rotate(' + r4(now) + ' ' + cx + ' ' + r4(at(cy)) + ')');
+        }
+      }
+    }
+    svg.setAttribute('viewBox', '0 0 ' + boxW + ' ' + r4(at(boxH)));
+    factor = k;
+  };
+
+  // What the reader is looking at stays where it is: the instant at the middle of the window
+  // before the change is put back at the middle after it.
+  // The page turns off the browser's own attempt at the same thing (`overflow-anchor`): where a
+  // browser has one, the two corrections add up and the view jumps by as much again.
+  const rescale = k => {
+    const box = svg.getBoundingClientRect();
+    const px = box.width / boxW;
+    const seen = (window.innerHeight / 2 - box.top) / px;
+    const instant = seen <= origin ? seen : origin + (seen - origin) / factor;
+    // Where to be afterwards is worked out before anything moves, and asked for outright. A
+    // relative scroll goes wrong when the page shrinks: the browser first pulls the view back
+    // inside the shorter page, and the step is then taken from the wrong place.
+    const after = instant <= origin ? instant : origin + (instant - origin) * k;
+    const target = window.scrollY + (after - seen) * px;
+    stretch(k);
+    window.scrollTo(0, target);
+  };
+
+  const slider = document.querySelector('#scale input');
+  const shown = document.querySelector('#scale output');
+  let pending = null;
+  slider.addEventListener('input', () => {
+    // The slider runs on a logarithm, so halving and doubling are the same distance apart.
+    const k = Math.pow(2, +slider.value);
+    shown.textContent = '×' + (k >= 10 ? k.toFixed(0) : k.toFixed(2));
+    // A timer rather than an animation frame: a frame never comes while the page is in the
+    // background, and the scale would silently stay where it was.
+    if (pending === null) setTimeout(() => { rescale(pending); pending = null; }, 16);
+    pending = k;
+  });
+  slider.addEventListener('dblclick', () => { slider.value = 0; slider.dispatchEvent(new Event('input')); });
 })();"#;
 
     format!(
@@ -283,6 +388,7 @@ pub fn render(pic: &Picture, theme: Theme, run: &Run) -> String {
          <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n\
          <title>{title}</title>\n<style>\n{css}</style>\n\
          <main>\n  <div class=\"plot\">\n{body}  </div>\n</main>\n\
+         <label id=\"scale\" title=\"stretch or squeeze time; double-click to reset\">time <input type=\"range\" min=\"-4\" max=\"3\" step=\"0.05\" value=\"0\"><output>×1.00</output></label>\n\
          <div id=\"following\"></div>\n\
          <div id=\"legend\"></div>\n\
          <div id=\"panel\" role=\"status\" aria-live=\"polite\"></div>\n\
@@ -369,6 +475,8 @@ mod tests {
         let out = page("participants n0 n1\n0 n0 -> n1 .rb +10\n5 n1 deliver\n20 run end");
         assert!(out.contains(r#"{"e":0,"from":"n0","to":"n1","depart":0,"arrive":10,"left":true,"landed":true}"#), "{out}");
         assert!(out.contains(r#"{"e":1,"lane":"n1","t":5}"#), "{out}");
+        // And it carries the control that stretches time.
+        assert!(out.contains("id=\"scale\""), "{out}");
         // The end of the run belongs to no process.
         assert!(out.contains(r#""lane":null"#), "{out}");
     }
