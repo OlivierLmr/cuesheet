@@ -392,6 +392,16 @@ mod tests {
         assert_eq!(js("a</script>\"b"), r#""a\u003c/script>\"b""#);
     }
 
+    /// A browser shows an SVG's `<title>` as a tooltip over the whole drawing, on top of the event
+    /// the pointer is reading. The page names the picture where nothing is displayed instead.
+    #[test]
+    fn the_page_puts_no_tooltip_over_the_drawing() {
+        let out = page("title \"a run\"\n0 n0 -> n1 .rb +10");
+        let drawing = &out[out.find("<svg").unwrap()..out.find("</svg>").unwrap()];
+        assert!(!drawing.contains("<title>"), "{drawing}");
+        assert!(drawing.contains("aria-label=\"a run\""), "{drawing}");
+    }
+
     #[test]
     fn the_page_is_self_contained_with_no_external_requests() {
         let out = page("0 n0 -> n1 .rb +10");
