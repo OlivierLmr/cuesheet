@@ -262,6 +262,23 @@ impl Placement {
         }
     }
 
+    /// Every place this label's centre can be, whatever it is nudged to: `(x0, x1, y0, y1)`.
+    ///
+    /// Its freedom is bounded — a rail label stays on its arrow and a pinned one within its slack —
+    /// so this is a box, and anything outside it can never touch the label.
+    fn range(&self) -> (f64, f64, f64, f64) {
+        match &self.anchorage {
+            Anchorage::Rail { a, b, .. } => {
+                let off = self.h * 0.72;
+                (a.0.min(b.0) - off, a.0.max(b.0) + off, a.1.min(b.1) - off, a.1.max(b.1) + off)
+            }
+            Anchorage::Pin { x, y, gap, .. } => {
+                let reach = gap + self.w * 0.5;
+                (x - reach, x + reach, y - PIN_SLACK, y + PIN_SLACK)
+            }
+        }
+    }
+
     /// Where it would rather be, and how hard it is pulled back there.
     fn home(&self) -> f64 {
         match &self.anchorage {
@@ -340,22 +357,94 @@ fn dist_to_segment(p: (f64, f64), s: (f64, f64, f64, f64)) -> f64 {
     ((p.0 - cx).powi(2) + (p.1 - cy).powi(2)).sqrt()
 }
 
+/// For each label, the only things that can ever cost it anything.
+///
+/// The cost of a label used to be summed over every other label, every arrow, every rule and every
+/// fixed box on the page, at each of some eight hundred evaluations per label. Nearly all of those
+/// terms are zero, and always will be: a label cannot leave its [`Placement::range`], so whatever
+/// lies clear of that box never touches it. On a run of a thousand messages the settling took
+/// twenty seconds, and four times that for twice the messages.
+///
+/// So the far things are set aside once, before anything moves. What is left is visited in the
+/// same order as before and contributes the same numbers, and the terms dropped were exact zeros:
+/// the arrangement that comes out is the same one, to the last bit.
+struct Near {
+    labels: Vec<Vec<usize>>,
+    fixed: Vec<Vec<usize>>,
+    rules: Vec<Vec<usize>>,
+    segments: Vec<Vec<usize>>,
+}
+
+impl Near {
+    fn of(ps: &[Placement], obs: &Obstacles) -> Self {
+        // A little wider than the tests it stands in for, so that rounding can only ever keep a
+        // neighbour that did not matter, never drop one that did.
+        const SLOP: f64 = 1.0;
+        let ranges: Vec<(f64, f64, f64, f64)> = ps.iter().map(Placement::range).collect();
+        // The box a label's own box can cover, rather than its centre.
+        let boxes: Vec<(f64, f64, f64, f64)> = ranges
+            .iter()
+            .zip(ps)
+            .map(|(r, p)| (r.0 - p.w * 0.5, r.1 + p.w * 0.5, r.2 - p.h * 0.5, r.3 + p.h * 0.5))
+            .collect();
+        let meet = |a: (f64, f64, f64, f64), b: (f64, f64, f64, f64), px: f64, py: f64| {
+            a.0 - px <= b.1 && b.0 - px <= a.1 && a.2 - py <= b.3 && b.2 - py <= a.3
+        };
+
+        let mut near = Near { labels: vec![], fixed: vec![], rules: vec![], segments: vec![] };
+        for (i, p) in ps.iter().enumerate() {
+            // `overlap` allows 4 across and 2 down beyond touching.
+            near.labels.push(
+                (0..ps.len()).filter(|&j| j != i && meet(boxes[i], boxes[j], 4.0 + SLOP, 2.0 + SLOP)).collect(),
+            );
+            near.fixed.push(
+                (0..obs.fixed.len())
+                    .filter(|&k| {
+                        let f = obs.fixed[k];
+                        let b = (f.0 - f.2 * 0.5, f.0 + f.2 * 0.5, f.1 - f.3 * 0.5, f.1 + f.3 * 0.5);
+                        meet(boxes[i], b, 4.0 + SLOP, 2.0 + SLOP)
+                    })
+                    .collect(),
+            );
+            // A rule costs when it runs through the label: within half its height of its centre.
+            near.rules.push(
+                (0..obs.rules.len())
+                    .filter(|&k| {
+                        let y = obs.rules[k];
+                        y >= boxes[i].2 - SLOP && y <= boxes[i].3 + SLOP
+                    })
+                    .collect(),
+            );
+            // An arrow costs when the centre comes within `clear` of it.
+            let clear = p.h * 0.45 + SLOP;
+            near.segments.push(
+                (0..obs.segments.len())
+                    .filter(|&k| {
+                        let g = obs.segments[k];
+                        let b = (g.0.min(g.2), g.0.max(g.2), g.1.min(g.3), g.1.max(g.3));
+                        meet(ranges[i], b, clear, clear)
+                    })
+                    .collect(),
+            );
+        }
+        near
+    }
+}
+
 /// What one placement costs where it currently sits.
-fn local_cost(i: usize, ps: &[Placement], obs: &Obstacles) -> f64 {
+fn local_cost(i: usize, ps: &[Placement], obs: &Obstacles, near: &Near) -> f64 {
     let p = &ps[i];
     let c = p.centre();
     let me = (c.0, c.1, p.w, p.h);
     let mut cost = 0.0;
 
-    for (j, q) in ps.iter().enumerate() {
-        if j == i {
-            continue;
-        }
+    for &j in &near.labels[i] {
+        let q = &ps[j];
         let d = q.centre();
         cost += overlap(me, (d.0, d.1, q.w, q.h));
     }
-    for f in obs.fixed {
-        cost += overlap(me, *f);
+    for &k in &near.fixed[i] {
+        cost += overlap(me, obs.fixed[k]);
     }
     for x in obs.lanes {
         // A label beside a mark is *meant* to sit near its own lane, so only the lanes it does not
@@ -370,7 +459,8 @@ fn local_cost(i: usize, ps: &[Placement], obs: &Obstacles) -> f64 {
             cost += over * 0.6;
         }
     }
-    for y in obs.rules {
+    for &k in &near.rules[i] {
+        let y = obs.rules[k];
         let over = p.h * 0.5 - (c.1 - y).abs();
         if over > 0.0 {
             cost += over * 0.5;
@@ -379,8 +469,8 @@ fn local_cost(i: usize, ps: &[Placement], obs: &Obstacles) -> f64 {
     // The arrows. A message label rides just clear of its own line by design, so the threshold is
     // under that offset and its own arrow does not push it away from where it belongs.
     let clear = p.h * 0.45;
-    for seg in obs.segments {
-        let d = dist_to_segment(c, *seg);
+    for &k in &near.segments[i] {
+        let d = dist_to_segment(c, obs.segments[k]);
         if d < clear {
             cost += (clear - d) * 1.8;
         }
@@ -407,8 +497,8 @@ fn local_cost(i: usize, ps: &[Placement], obs: &Obstacles) -> f64 {
     cost
 }
 
-fn total_cost(ps: &[Placement], obs: &Obstacles) -> f64 {
-    (0..ps.len()).map(|i| local_cost(i, ps, obs)).sum()
+fn total_cost(ps: &[Placement], obs: &Obstacles, near: &Near) -> f64 {
+    (0..ps.len()).map(|i| local_cost(i, ps, obs, near)).sum()
 }
 
 /// Settle every label into somewhere it can be read.
@@ -435,9 +525,10 @@ fn relax(
         return;
     }
     let obs = Obstacles { lanes, rules, fixed, left: bounds.0, right: bounds.1, segments };
+    let near = Near::of(ps, &obs);
 
     let mut best: Vec<(f64, f64)> = ps.iter().map(|p| (p.param(), p.side)).collect();
-    let mut best_cost = total_cost(ps, &obs);
+    let mut best_cost = total_cost(ps, &obs, &near);
 
     for pass in 0..PASSES {
         let step = (1.0 - pass as f64 / PASSES as f64).max(0.15);
@@ -448,9 +539,9 @@ fn relax(
         for i in 0..ps.len() {
             // Discrete first: the side is a bigger move than a nudge, and choosing it badly makes
             // the nudge meaningless.
-            let before = local_cost(i, ps, &obs);
+            let before = local_cost(i, ps, &obs, &near);
             ps[i].side = -ps[i].side;
-            if local_cost(i, ps, &obs) >= before {
+            if local_cost(i, ps, &obs, &near) >= before {
                 ps[i].side = -ps[i].side;
             }
 
@@ -464,7 +555,7 @@ fn relax(
             let here = ps[i].param();
             let at = |ps: &mut [Placement], v: f64| {
                 ps[i].set_param(v);
-                local_cost(i, ps, &obs)
+                local_cost(i, ps, &obs, &near)
             };
             let c0 = at(ps, here);
             let cm = at(ps, here - reach);
@@ -480,7 +571,7 @@ fn relax(
             moved += (pick - here).abs();
         }
 
-        let c = total_cost(ps, &obs);
+        let c = total_cost(ps, &obs, &near);
         if c < best_cost {
             best_cost = c;
             best = ps.iter().map(|p| (p.param(), p.side)).collect();
