@@ -151,7 +151,7 @@ fn run(argv: &[String]) -> Result<(), String> {
 
     let bytes: Vec<u8> = match format.as_str() {
         "svg" => cuesheet::svg::render(&pic, &cuesheet::svg::Options::default()).into_bytes(),
-        "html" | "htm" => cuesheet::html::render(&pic, sheet.diagram.theme).into_bytes(),
+        "html" | "htm" => cuesheet::html::render(&pic, sheet.diagram.theme, &run).into_bytes(),
         "png" => png_bytes(&pic)?,
         other => {
             return Err(format!(
