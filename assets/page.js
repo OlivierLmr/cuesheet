@@ -31,8 +31,19 @@
     panel.append(b, document.createTextNode(text));
     panel.classList.add('on');
   };
+  // What the pointer means, where several things are drawn over one another: the one on top that
+  // is not faded, if there is one. Once the reader has narrowed the run down, what is left is what
+  // they are reading, and a faded arrow lying across it must not take the click meant for it.
+  const faded = el => el.classList.contains('off') || el.classList.contains('dim');
+  const meant = e => {
+    const under = document.elementsFromPoint(e.clientX, e.clientY)
+      .map(el => el.closest('[data-event]'))
+      .filter(el => el && plot.contains(el));
+    return under.find(el => !faded(el)) || under[0] || null;
+  };
+
   plot.addEventListener('mouseover', e => {
-    const el = e.target.closest('[data-event]');
+    const el = meant(e);
     if (el) show(el.dataset.event, roleOf(el)); else hide();
   });
   plot.addEventListener('mouseleave', hide);
@@ -138,7 +149,7 @@
 
   plot.addEventListener('click', e => {
     const label = e.target.closest('.p.participant');
-    const el = e.target.closest('[data-event]');
+    const el = meant(e);
     if (label) {
       const name = label.textContent.trim();
       chosen = chosen && chosen.lane === name ? null : { lane: name };
